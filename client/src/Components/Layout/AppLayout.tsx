@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Navbar from './Navbar'
+import ChatList from '../Specific/ChatList';
 
 type WrappedComponentProps = {
     [key: string]: any; // Use appropriate type for your props
@@ -34,7 +35,7 @@ const AppLayout = () => (WrappedComponent: React.ComponentType<WrappedComponentP
                         {/* Left section */}
                         <div className={`hidden md:block glassmorphism rounded-2xl ${isMobileMenuOpen ? 'block' : 'hidden'} md:block`}>
 
-                            Left Section
+                            <ChatList chats={['1','2','3','4','5','6']}/>
                         </div>
 
 
