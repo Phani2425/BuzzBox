@@ -1,3 +1,4 @@
+import AppLayout from "@/Components/Layout/AppLayout"
 
 
 const Chat = () => {
@@ -6,4 +7,4 @@ const Chat = () => {
   )
 }
 
-export default Chat
+export default AppLayout()(Chat)

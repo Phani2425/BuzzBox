@@ -1,3 +1,4 @@
+import AppLayout from "@/Components/Layout/AppLayout"
 
 
 const Home = () => {
@@ -6,4 +7,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default AppLayout()(Home);

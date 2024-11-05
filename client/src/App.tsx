@@ -1,6 +1,8 @@
 import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
+import RouteProtector from './Components/ProtectedRoute/RouteProtector'
+import PageNotFound from './Components/PagerNotFound'
 
 
 const Home = lazy(()=> import("./pages/Home"))
@@ -13,10 +15,11 @@ function App() {
 
   return (
    <Routes>
-    <Route path='/' element={<Home/>}/>
+    <Route path='/' element={<RouteProtector redirect='/login'><Home/></RouteProtector>}/>
     <Route path='/login' element={<Login/>} />
-    <Route path='/chat/:id' element={<Chat/>} />
-    <Route path='/group' element={<Group/>} />
+    <Route path='/chat/:id' element={<RouteProtector redirect='/login'><Chat/></RouteProtector>} />
+    <Route path='/group' element={<RouteProtector redirect='/login'><Group/></RouteProtector>} />
+    <Route path='*' element={<PageNotFound/>}/>
    </Routes>
   )
 }

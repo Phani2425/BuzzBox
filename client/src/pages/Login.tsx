@@ -154,7 +154,7 @@ const Login = () => {
                   ) : (
                     <div className="flex flex-col justify-center items-center gap-4">
                       <FiUploadCloud size={23} className="text-yellow-600" />
-                      <p className="text-yellow-600 text-sm">
+                      <p className="text-yellow-600 text-sm text-center">
                         Drag 'n' drop some files here, or click to select files
                       </p>
                     </div>

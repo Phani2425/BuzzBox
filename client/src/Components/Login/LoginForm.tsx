@@ -62,7 +62,7 @@ const LoginForm:React.FC<loginProp> = ({setLogin}) => {
           </div>
 
           <div className="flex flex-col gap-4 w-full">
-            <div className="flex flex-row md:flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2 items-start">
                 <label className="text-white" htmlFor="email">
                   Email<span className="text-pink-800">*</span>

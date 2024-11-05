@@ -11,6 +11,8 @@ import combinedReducer from "../src/redux/reducerCombiner";
 const store = configureStore({
   reducer: combinedReducer,
 });
+// Infer the `RootState` type from the store itself
+export type RootState = ReturnType<typeof store.getState>;
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
