@@ -50,6 +50,10 @@ const Login = () => {
       form.append("image", image);
 
       //make api call and submit
+
+      // if(response.success){
+      //   setLogin(true);
+      // }
     } catch (error) {
       if (error instanceof z.ZodError) {
         const validationErrors: Record<string, string> = {};
