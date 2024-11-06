@@ -1,14 +1,17 @@
 import LoginForm from "@/Components/Login/LoginForm";
 import { Button } from "@/components/ui/button";
 import { userSchema } from "@/Schema/formSchema";
-import { useCallback, useState } from "react";
+import { connectToApi } from "@/Service/apiConnector";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FiUploadCloud } from "react-icons/fi";
 import { z } from "zod";
+import { authEndpoints } from "@/Service/apis";
 
 interface Form {
   email: string;
   password: string;
+  userName: string;
 }
 
 const Login = () => {
@@ -29,7 +32,52 @@ const Login = () => {
   const [formdata, setfromdata] = useState<Form>({
     email: "",
     password: "",
+    userName: "",
   });
+
+  const [userNameUnique, setUserNameUnique] = useState<boolean>(false);
+
+  //function that will gte called when user stops typing for some seconds
+  const checkUserName = async () => {
+    try {
+      console.log('checking');
+      const response = await connectToApi("POST", authEndpoints.userName, {
+        userName: formdata.userName,
+      });
+      if (response && response.data.message === "username is already taken") {
+        setUserNameUnique(false);
+        setErrors((prev) => {
+          return { ...prev, userName: "username already exists" };
+        });
+      }
+      else if(response && response.data.message === "username is unique"){
+        setErrors((prev) =>{
+          return { ...prev, userName: "" };
+        } )
+        setUserNameUnique(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //implementing debouncing for api call only when user stops typing for some seconds
+  useEffect(() => {
+    if(formdata.userName.length < 3){
+      setUserNameUnique(false);
+      setErrors((prev) =>{
+        return { ...prev, userName: "" };
+      } )
+      return;
+    }
+    const timeoutId = setTimeout(() => {
+      checkUserName();
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [formdata.userName]);
 
   const changehandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = e.target;
@@ -39,7 +87,7 @@ const Login = () => {
     });
   };
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     setloading(true);
     try {
       userSchema.parse(formdata);
@@ -48,12 +96,18 @@ const Login = () => {
       form.append("email", formdata.email);
       form.append("password", formdata.password);
       form.append("image", image);
+      if(userNameUnique){
+        form.append("userName", formdata.userName);
+      }
 
       //make api call and submit
+      const response = await connectToApi("POST", authEndpoints.signup, form);
 
-      // if(response.success){
-      //   setLogin(true);
-      // }
+      if (response && response.data) {
+        setLogin(true);
+      } else {
+        throw new Error("Something went wrong");
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         const validationErrors: Record<string, string> = {};
@@ -109,29 +163,55 @@ const Login = () => {
                   name="email"
                   id="email"
                   value={formdata.email}
-                  placeholder="enter Your Email or Username"
+                  placeholder="Email"
                   className="py-2 px-3 placeholder:text-slate-700 bg-transparent border-slate-700 focus-within:outline-none rounded-lg border text-white w-[85%] md:w-full"
                   onChange={changehandler}
                 />
                 {errors.email && <p className="text-red-600">{errors.email}</p>}
               </div>
 
-              <div className="flex flex-col gap-2 items-start">
-                <label className="text-white" htmlFor="password">
-                  Password<span className="text-pink-800">*</span>
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  value={formdata.password}
-                  placeholder="enter Your Password"
-                  className="py-2 px-3 placeholder:text-slate-700 bg-transparent focus-within:outline-none rounded-lg border text-white border-slate-700 w-[85%] md:w-full"
-                  onChange={changehandler}
-                />
-                {errors.password && (
-                  <p className="text-red-600">{errors.password}</p>
-                )}
+              <div className="flex w-full justify-between  gap-2">
+                <div className="flex flex-col gap-2 items-start">
+                  <label className="text-white" htmlFor="userName">
+                    UserName<span className="text-pink-800">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="userName"
+                    id="userName"
+                    value={formdata.userName}
+                    placeholder="userName"
+                    className="py-2 px-3 placeholder:text-slate-700 bg-transparent focus-within:outline-none rounded-lg border text-white border-slate-700 w-[85%] md:w-full"
+                    onChange={changehandler}
+                  />
+                  {errors.userName && (
+                    <p className="text-red-600">{errors.userName}</p>
+                  )
+                  }
+                  {
+                    userNameUnique && (
+                      <p className="text-green-600">UserName is Unique</p>
+                    )
+                  }
+                </div>
+
+                <div className="flex flex-col gap-2 items-start">
+                  <label className="text-white" htmlFor="password">
+                    Password<span className="text-pink-800">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    value={formdata.password}
+                    placeholder="Password"
+                    className="py-2 px-3 placeholder:text-slate-700 bg-transparent focus-within:outline-none rounded-lg border text-white border-slate-700 w-[85%] md:w-full"
+                    onChange={changehandler}
+                  />
+                  {errors.password && (
+                    <p className="text-red-600">{errors.password}</p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -139,7 +219,11 @@ const Login = () => {
               <span className="text-white mb-2">Profile Picture</span>
               {previewimge ? (
                 <div className="bg-transparent border-slate-700 focus-within:outline-none rounded-lg border text-white w-full h-40 flex justify-center items-center">
-                  <img src={previewimge} alt="profileimage" />
+                  <img
+                    src={previewimge}
+                    alt="profileimage"
+                    className="object-contain w-full h-full"
+                  />
                 </div>
               ) : (
                 <div

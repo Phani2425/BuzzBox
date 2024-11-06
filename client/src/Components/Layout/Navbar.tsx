@@ -10,6 +10,10 @@ import {
 } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { lazy, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/main";
+import { set } from "zod";
+import { setToken, setUser } from "@/redux/slices/authSlice";
 
 const Searchcomp = lazy(() => import('../Navbar/Search'));
 const NewGroup = lazy(() => import('../Navbar/Newgroup'));
@@ -23,7 +27,10 @@ interface props {
 
 const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
+  const {user} = useSelector((state:RootState) => state.auth)
+
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [isSearch,setisSearch] = useState<boolean>(false);
     const [isNewGroup,setisNewGroup] = useState<boolean>(false);
@@ -38,6 +45,13 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
     const notificationhandler = () =>{
         setisNotification((prev) => !prev)
     }
+
+    //handlers
+    const logOutHandler = () =>{
+        localStorage.clear();
+        dispatch(setUser(null));
+        dispatch(setToken(null));
+        navigate('/login'); }
 
 
   return (
@@ -109,7 +123,7 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-400" onClick={()=>{navigate('/group')}}>
+                <Button variant="ghost" size="icon" className="text-zinc-400" onClick={logOutHandler}>
                   <LogOut/>
                   <span className="sr-only">Logout</span>
                 </Button>
@@ -124,7 +138,7 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
                 <Button variant="ghost" size="icon" className="relative">
                   <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#00A3FF] [box-shadow:0_0_8px_rgba(0,163,255,0.5)]" />
                   <Avatar>
-                    <AvatarImage src="/placeholder.svg" />
+                    <AvatarImage src={user?.profilePic} />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                   <span className="sr-only">User Profile</span>

@@ -10,7 +10,7 @@ type WrappedComponentProps = {
 
 const AppLayout = () => (WrappedComponent: React.ComponentType<WrappedComponentProps>) => {
     return (props: WrappedComponentProps) => {
-        const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+        const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
         return (
             <div className='relative min-h-screen overflow-hidden bg-black'>

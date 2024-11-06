@@ -1,0 +1,59 @@
+const mongoose = require('mongoose');
+
+const UserScema = new mongoose.Schema({
+    email:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    password:{
+        type:String,
+        required:true
+    },
+    userName:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    profilePic:{
+        type:String,
+        default:''
+    },
+    friends:{
+        type:[
+            {
+               type:mongoose.Schema.Types.ObjectId,
+               ref:'User'
+            }
+        ],
+        default:[]
+    },
+    bio:{
+        type:String,
+        default:''
+    },
+    requests:{
+        type:[
+            {
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Request'
+            }
+        ],
+        default:[]
+    },
+    notifiactions:{
+        type:[
+            {
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Notification'
+            }
+        ],
+        default:[]
+    },
+    createdAt:{
+        type:Date,
+        default:Date.now()
+    }
+})
+
+module.exports = mongoose.model('User',UserScema);
