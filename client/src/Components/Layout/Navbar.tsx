@@ -1,4 +1,13 @@
-import { MessageSquare, Search, UserPlus, Users, Menu, X, BellDotIcon, LogOut } from "lucide-react";
+import {
+  MessageSquare,
+  Search,
+  UserPlus,
+  Users,
+  Menu,
+  X,
+  BellDotIcon,
+  LogOut,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,10 +24,9 @@ import { RootState } from "@/main";
 import { set } from "zod";
 import { setToken, setUser } from "@/redux/slices/authSlice";
 
-const Searchcomp = lazy(() => import('../Navbar/Search'));
-const NewGroup = lazy(() => import('../Navbar/Newgroup'));
-const Notification = lazy(() => import('../Navbar/Notifications'));
-
+const Searchcomp = lazy(() => import("../Navbar/Search"));
+const NewGroup = lazy(() => import("../Navbar/Newgroup"));
+const Notification = lazy(() => import("../Navbar/Notifications"));
 
 interface props {
   isMobileMenuOpen: boolean;
@@ -26,33 +34,32 @@ interface props {
 }
 
 const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
+  const { user } = useSelector((state: RootState) => state.auth);
 
-  const {user} = useSelector((state:RootState) => state.auth)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const [isSearch, setisSearch] = useState<boolean>(false);
+  const [isNewGroup, setisNewGroup] = useState<boolean>(false);
+  const [isNotification, setisNotification] = useState<boolean>(false);
 
-    const [isSearch,setisSearch] = useState<boolean>(false);
-    const [isNewGroup,setisNewGroup] = useState<boolean>(false);
-    const [isNotification,setisNotification] = useState<boolean>(false);
+  const searchhandler = () => {
+    setisSearch((prev) => !prev);
+  };
+  const newgrouphandler = () => {
+    setisNewGroup((prev) => !prev);
+  };
+  const notificationhandler = () => {
+    setisNotification((prev) => !prev);
+  };
 
-    const searchhandler = () =>{
-        setisSearch((prev) => !prev)
-    }
-    const newgrouphandler = () =>{
-        setisNewGroup((prev) => !prev)
-    }
-    const notificationhandler = () =>{
-        setisNotification((prev) => !prev)
-    }
-
-    //handlers
-    const logOutHandler = () =>{
-        localStorage.clear();
-        dispatch(setUser(null));
-        dispatch(setToken(null));
-        navigate('/login'); }
-
+  //handlers
+  const logOutHandler = () => {
+    localStorage.clear();
+    dispatch(setUser(null));
+    dispatch(setToken(null));
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800 bg-black/50 backdrop-blur-xl">
@@ -75,7 +82,12 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-400 " onClick={searchhandler}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-zinc-400 "
+                  onClick={searchhandler}
+                >
                   <Search className="h-5 w-5" />
                   <span className="sr-only">Search</span>
                 </Button>
@@ -87,7 +99,12 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-400 " onClick={newgrouphandler} >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-zinc-400 "
+                  onClick={newgrouphandler}
+                >
                   <UserPlus className="h-5 w-5" />
                   <span className="sr-only">Create Group</span>
                 </Button>
@@ -99,7 +116,14 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-400" onClick={()=>{navigate('/group')}}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-zinc-400"
+                  onClick={() => {
+                    navigate("/group");
+                  }}
+                >
                   <Users className="h-5 w-5" />
                   <span className="sr-only">Manage Groups</span>
                 </Button>
@@ -111,8 +135,13 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-400" onClick={notificationhandler}>
-                  <BellDotIcon/>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-zinc-400"
+                  onClick={notificationhandler}
+                >
+                  <BellDotIcon />
                   <span className="sr-only">Notification</span>
                 </Button>
               </TooltipTrigger>
@@ -123,8 +152,13 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-zinc-400" onClick={logOutHandler}>
-                  <LogOut/>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-zinc-400"
+                  onClick={logOutHandler}
+                >
+                  <LogOut />
                   <span className="sr-only">Logout</span>
                 </Button>
               </TooltipTrigger>
@@ -135,14 +169,14 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#00A3FF] [box-shadow:0_0_8px_rgba(0,163,255,0.5)]" />
+                <div>
+                  {" "}
                   <Avatar>
                     <AvatarImage src={user?.profilePic} />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                   <span className="sr-only">User Profile</span>
-                </Button>
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>User Profile</p>
@@ -150,15 +184,9 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        {
-            isSearch && <Searchcomp/>
-        }
-        {
-            isNewGroup && <NewGroup/>
-        }
-        {
-            isNotification && <Notification/>
-        }
+        {isSearch && <Searchcomp />}
+        {isNewGroup && <NewGroup />}
+        {isNotification && <Notification />}
       </div>
     </header>
   );
