@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { setToken, setUser } from "@/redux/slices/authSlice";
-import { userSchema } from "@/Schema/formSchema";
 import { connectToApi } from "@/Service/apiConnector";
 import { authEndpoints } from "@/Service/apis";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
 
 interface loginProp {
   setLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,6 +19,7 @@ interface loginForm {
 const LoginForm: React.FC<loginProp> = ({ setLogin }) => {
   const Dispatch = useDispatch();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [loginform, setloginform] = useState<loginForm>({
     email: "",
@@ -39,7 +39,9 @@ const LoginForm: React.FC<loginProp> = ({ setLogin }) => {
 
       if (response) {
         console.log(response.data);
-
+        toast({
+          description: "Login Successfull",
+        });
         Dispatch(setUser(response.data.user));
         Dispatch(setToken(response.data.token));
         localStorage.setItem("User", JSON.stringify(response.data.user));
@@ -48,8 +50,12 @@ const LoginForm: React.FC<loginProp> = ({ setLogin }) => {
       } else {
         throw new Error("something went wrong");
       }
-      //
     } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Invalid Email or Password",
+      });
       if (error instanceof Error) {
         console.log(error.message);
       } else {

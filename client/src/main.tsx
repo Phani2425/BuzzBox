@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import combinedReducer from "../src/redux/reducerCombiner";
+import { Toaster } from "./components/ui/toaster.tsx";
 
 //configuring the redux store
 const store = configureStore({
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
     <HelmetProvider>
       <Provider store={store}>
         <App />
+        <Toaster/>
       </Provider>
     </HelmetProvider>
   </BrowserRouter>

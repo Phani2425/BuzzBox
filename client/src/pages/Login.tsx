@@ -7,6 +7,8 @@ import { useDropzone } from "react-dropzone";
 import { FiUploadCloud } from "react-icons/fi";
 import { z } from "zod";
 import { authEndpoints } from "@/Service/apis";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
 
 interface Form {
   email: string;
@@ -15,6 +17,8 @@ interface Form {
 }
 
 const Login = () => {
+  const { toast } = useToast();
+
   const [image, setimage] = useState("");
   const [previewimge, setpreviewimage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -40,7 +44,7 @@ const Login = () => {
   //function that will gte called when user stops typing for some seconds
   const checkUserName = async () => {
     try {
-      console.log('checking');
+      console.log("checking");
       const response = await connectToApi("POST", authEndpoints.userName, {
         userName: formdata.userName,
       });
@@ -49,11 +53,10 @@ const Login = () => {
         setErrors((prev) => {
           return { ...prev, userName: "username already exists" };
         });
-      }
-      else if(response && response.data.message === "username is unique"){
-        setErrors((prev) =>{
+      } else if (response && response.data.message === "username is unique") {
+        setErrors((prev) => {
           return { ...prev, userName: "" };
-        } )
+        });
         setUserNameUnique(true);
       }
     } catch (error) {
@@ -63,11 +66,11 @@ const Login = () => {
 
   //implementing debouncing for api call only when user stops typing for some seconds
   useEffect(() => {
-    if(formdata.userName.length < 3){
+    if (formdata.userName.length < 3) {
       setUserNameUnique(false);
-      setErrors((prev) =>{
+      setErrors((prev) => {
         return { ...prev, userName: "" };
-      } )
+      });
       return;
     }
     const timeoutId = setTimeout(() => {
@@ -96,7 +99,7 @@ const Login = () => {
       form.append("email", formdata.email);
       form.append("password", formdata.password);
       form.append("image", image);
-      if(userNameUnique){
+      if (userNameUnique) {
         form.append("userName", formdata.userName);
       }
 
@@ -105,10 +108,19 @@ const Login = () => {
 
       if (response && response.data) {
         setLogin(true);
+        toast({
+          description: "Account Created Successfully",
+        });
       } else {
         throw new Error("Something went wrong");
       }
     } catch (error) {
+      toast({
+        title: "Account Creation Failed",
+        description: "Something went wrong",
+        variant: "destructive",
+        action: <ToastAction altText="Try Again">Try again</ToastAction>,
+      });
       if (error instanceof z.ZodError) {
         const validationErrors: Record<string, string> = {};
         error.errors.forEach(({ path, message }) => {
@@ -186,13 +198,10 @@ const Login = () => {
                   />
                   {errors.userName && (
                     <p className="text-red-600">{errors.userName}</p>
-                  )
-                  }
-                  {
-                    userNameUnique && (
-                      <p className="text-green-600">UserName is Unique</p>
-                    )
-                  }
+                  )}
+                  {userNameUnique && (
+                    <p className="text-green-600">UserName is Unique</p>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2 items-start">
@@ -228,7 +237,7 @@ const Login = () => {
               ) : (
                 <div
                   {...getRootProps()}
-                  className="bg-transparent border-slate-700 focus-within:outline-none rounded-lg border text-white w-full h-40 flex justify-center items-center"
+                  className="bg-transparent border-slate-700 focus-within:outline-none rounded-lg border text-white w-full h-32 flex justify-center items-center"
                 >
                   <input {...getInputProps()} id="image" />
                   {isDragActive ? (

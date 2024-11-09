@@ -21,8 +21,8 @@ import { useNavigate } from "react-router-dom";
 import { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/main";
-import { set } from "zod";
 import { setToken, setUser } from "@/redux/slices/authSlice";
+import { useToast } from "@/hooks/use-toast";
 
 const Searchcomp = lazy(() => import("../Navbar/Search"));
 const NewGroup = lazy(() => import("../Navbar/Newgroup"));
@@ -36,6 +36,7 @@ interface props {
 const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { user } = useSelector((state: RootState) => state.auth);
 
+  const { toast } = useToast();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -55,6 +56,9 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
   //handlers
   const logOutHandler = () => {
+    toast({
+      description: "Logged Out",
+    })
     localStorage.clear();
     dispatch(setUser(null));
     dispatch(setToken(null));
