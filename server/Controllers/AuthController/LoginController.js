@@ -2,8 +2,10 @@ const User = require('../../Models/User');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
+require('dotenv').config();
 
 exports. LoginController = async (req, resp) => {
+    console.log(process.env.JWT_SECRET)
     try{
         console.log(req.body);
         const {email,password} = req.body;

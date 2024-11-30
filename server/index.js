@@ -4,8 +4,6 @@ const app = express();
 require('dotenv').config();
 const cors =  require('cors');
 const cookieParser = require('cookie-parser');
-const uploadProfileInstance = require('./Config/multerConfig');
-const { SignupController } = require('./Controllers/AuthController/SignupController');
 const router = require('./Routes/route');
 
 
@@ -20,7 +18,7 @@ app.use(cors({
 //routes section
 app.use('/api/v1',router);
 
-app.get('/',(req,resp) => {
+app.get('/',(_,resp) => {
  resp.send('app is up and running')
 })
 

@@ -41,7 +41,8 @@ const Login = () => {
 
   const [userNameUnique, setUserNameUnique] = useState<boolean>(false);
 
-  //function that will gte called when user stops typing for some seconds
+  //function that will get called when user stops typing for some seconds
+  //deboucing
   const checkUserName = async () => {
     try {
       console.log("checking");

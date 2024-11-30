@@ -2,7 +2,7 @@ const uploadProfileInstance = require('../Config/multerConfig');
 const { LoginController } = require('../Controllers/AuthController/LoginController');
 const { SignupController } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
-const { newgroupChat } = require('../Controllers/ChatController/chat');
+// const { newgroupChat, getMyChats } = require('../Controllers/ChatController/chat');
 const { ProfileController } = require('../Controllers/UserController/ProfileController');
 const { isAuthenticated } = require('../Middlewares/auth');
 
@@ -17,7 +17,8 @@ router.post('/username', FindUniqueUserName);
 //user Routes
 router.get('/profile',isAuthenticated,ProfileController); 
 
-//group creation
-router.post('/chat/newgroup',isAuthenticated,newgroupChat);
+// //group creation
+// router.post('/chat/newgroup',isAuthenticated,newgroupChat);
+// router.get('/chat/mychats',isAuthenticated,getMyChats);
 
 module.exports = router;

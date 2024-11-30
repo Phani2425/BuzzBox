@@ -5,7 +5,7 @@ const User = require('../../Models/User');
 
 exports. ProfileController = async(req,resp) => {
    try{
-     //as we are coming here after gooing through the auth middleware so we have the user in the req object
+     //as we are coming here after going through the auth middleware so we have the user in the req object
      const userId = req.user.id;
         //fetch the user profile
         const user = await User.findById(userId);
@@ -20,3 +20,25 @@ exports. ProfileController = async(req,resp) => {
 }
 
 //controller for searching users
+exports. SearchUser = async(req,resp) => {
+   try{
+
+      //fetching the username from query of url
+      const userName = req.query;
+
+      //do some operations
+
+      //return response
+      return resp.status(200).json({
+         success:true,
+         user:userName
+      })
+
+   }catch(err){
+     console.log('error occured while searching user',err.message);
+     resp.status(500).json({
+      success:false,
+      message:'error occuered while searching user'
+     })
+   }
+}
