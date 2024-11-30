@@ -5,6 +5,7 @@ require('dotenv').config();
 const cors =  require('cors');
 const cookieParser = require('cookie-parser');
 const router = require('./Routes/route');
+// const { createFakeUser } = require('./seeders/userseed');
 
 
 app.use(express.json());
@@ -23,6 +24,8 @@ app.get('/',(_,resp) => {
 })
 
 connectToDatabase();
+
+// createFakeUser(20);
 
 
 const PORT = process.env.PORT || 5000;

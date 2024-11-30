@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 const User = require('../../Models/User');
-const bcryptjs = require('bcryptjs');
 
 
 exports.SignupController = async (req, resp) => {
@@ -14,13 +13,14 @@ exports.SignupController = async (req, resp) => {
         if (!profilePic) {
             return resp.status(400).json({ error: 'please upload a profile pic' })
         }
-        //storing the password by encrypting it
+        
 
-        const hashedPassword = await bcryptjs.hash(password, 10);
-
+        //here i usually save the password by hashing it but i can use an other approach by including a  middleware to do this in the mongoose schema
+        //both have same effect but i am doing this because as i ma using seeder to create fake user data and those will get saved to database without going throght this signup process so i am using such approach so that all password get hashed before saving and that is only possible in the middleware of schema approach
+        
         const user = new User({
             email,
-            password: hashedPassword,
+            password,
             userName,
             profilePic
         })

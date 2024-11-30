@@ -15,7 +15,7 @@ try{
         const tempUser = User.create({
             email:faker.internet.email(),
             password:'123456',
-            userName:faker.internet.userName(),
+            userName:faker.internet.username(),
             bio:faker.lorem.sentence(),
             profilePic:faker.image.avatar()
         })
@@ -24,7 +24,7 @@ try{
     }
 
     await Promise.all(user);
-    console.log(`user got created ${count}`);
+    console.log(`${count} no of users got created `);
     process.exit(1);
 
 }catch(err){
