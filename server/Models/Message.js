@@ -8,17 +8,15 @@ const MessageSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true
+        default: ''
     },
     attachments: {
         type: [{
-            publi_id: {
-                typr: String,
-                required: true
+            public_id: {
+                type: String
             },
             url: {
-                typr: String,
-                required: true
+                type: String
             }
         }], // Assuming attachments are stored as URLs or file paths
         default: []

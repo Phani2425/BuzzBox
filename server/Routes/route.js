@@ -1,8 +1,8 @@
-const uploadProfileInstance = require('../Config/multerConfig');
+const {uploadProfileInstance,uploadAttachments} = require('../Config/multerConfig');
 const { LoginController } = require('../Controllers/AuthController/LoginController');
 const { SignupController } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
-const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember } = require('../Controllers/ChatController/chat');
+const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments } = require('../Controllers/ChatController/chat');
 const { ProfileController, SearchUser } = require('../Controllers/UserController/ProfileController');
 const { isAuthenticated } = require('../Middlewares/auth');
 
@@ -26,5 +26,9 @@ router.get('/chat/mychats',isAuthenticated,getMyChats);
 router.get('/chat/getMyGroups',isAuthenticated,getMyGroupChats);
 router.put('/chat/addmember',isAuthenticated,addMembers);
 router.put('/chat/removemember',isAuthenticated,removeMember);
+router.delete('/chat/leavegroup/:id',isAuthenticated,leaveGroup);
+
+//send attachment route
+router.post('/message',isAuthenticated,uploadAttachments.array('files',10),sendAttachments);
 
 module.exports = router;
