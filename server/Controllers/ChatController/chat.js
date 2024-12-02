@@ -6,7 +6,7 @@ const { FETCH_CHAT, ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT } = require('../../
 const { emitEvent } = require('../../Utils/emitEvent');
 const { getOtherMember } = require('../../Utils/utilityFunctions');
 const Message = require('../../Models/Message');
-const cloudinary = require('../../Config/cloudinary');
+const {cloudinary} = require('../../Config/cloudinary');
 
 //controller for creating new group
 exports.CreateNewGroup = async (req, resp) => {
@@ -475,8 +475,6 @@ exports.sendAttachments = async (req, resp) => {
     }
 }
 
-//get messages
-
 //get chat details
 
 exports.getChatDetails = async (req, resp) => {
@@ -663,3 +661,73 @@ exports.deleteChat = async (req, resp) => {
         });
     }
 };
+
+
+//get messages
+
+//this controller will be called when any user opens any chat that can be persnal chat or group chat and the messages will be fetched but the catch here is that the messages will not be fetched all at once as that will be too much data to be fetched at once so i will be using pagination here
+
+//basically in frontend i will use debouncing to call api to fetch messages when the user scrolls to the top of the chat and i will be sending the page number and the limit of messages to be fetched in one go
+
+//i will be using the limit and skip method of mongoose to achieve this
+
+exports. getMessages = async(req,resp) => {
+    try{
+
+        const chatId = req.params.id;
+        //defaut value of page is 1
+        const {page=1} = req.query;
+
+        const chat = await Chat.findById(chatId);
+
+        if(!chat){
+            return resp.status(404).json({
+                success:false,
+                message:'chat not found'
+            })
+        }
+
+        const user = await User.findById(req.user.id);
+        if(!user){
+            return resp.status(404).json({
+                success:false,
+                message:'user not found'
+            })
+        }
+        if(!chat.members.includes(req.user.id)){
+            return resp.status(401).json({
+                success:false,
+                message:'you are not a member of the chat'
+            })
+        }
+
+        const limit = 20;
+        const skip = (page-1) * limit;
+
+        const [messages,messageCount] = await Promise.all([Message.find({chat:chatId})
+            .sort({createdAt:-1})//think why we did this
+            .skip(skip)
+            .limit(limit)
+            .populate('sender','userName')
+            .lean(),
+            Message.countDocuments({chat:chatId})]);
+
+            const totalPagesPossible = Math.ceil(messageCount/limit);
+
+        //i will be sending the total number of messages and the messages fetched in this api
+        resp.status(200).json({
+            success:true,
+            messages:messages.reverse(),//think why i did this
+            messageCount,
+            totalPagesPossible,
+            message:'messages fetched'
+        })
+
+    }catch(err){
+        console.error('error occured while fetching messages',err.message);
+        resp.status(500).json({
+            success:false,
+            message:'internal server error'
+        })
+    }
+}

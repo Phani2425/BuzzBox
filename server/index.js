@@ -5,6 +5,7 @@ require('dotenv').config();
 const cors =  require('cors');
 const cookieParser = require('cookie-parser');
 const router = require('./Routes/route');
+const { messageSeeder, singleChatSeeder, groupChatSeeder } = require('./seeders/chatseed');
 // const { createFakeUser } = require('./seeders/userseed');
 
 
@@ -26,6 +27,9 @@ app.get('/',(_,resp) => {
 connectToDatabase();
 
 // createFakeUser(20);
+// singleChatSeeder('674e0f64a9090787c28131da',10);
+// groupChatSeeder('674e0f64a9090787c28131da',10);
+// messageSeeder('674e06be737690061d1fc1ad',38);
 
 
 const PORT = process.env.PORT || 5000;

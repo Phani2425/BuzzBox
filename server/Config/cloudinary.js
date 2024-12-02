@@ -24,7 +24,7 @@ connectToCloudinary();
 
 //i am using multer to upload photo to cloudinary so we will be using an library to create an storage of cloudinary which will then passed inside the multer function to create an multer instance which will then be used an middleware to upload photos to cloudinary
 
-exports. profileStorage = new CloudinaryStorage({
+const profileStorage = new CloudinaryStorage({
     cloudinary,
     params:{
         folder:'BuzzBoxProfile',
@@ -32,4 +32,4 @@ exports. profileStorage = new CloudinaryStorage({
     }
 })
 
-module.exports = cloudinary;
+module.exports = {cloudinary,profileStorage};

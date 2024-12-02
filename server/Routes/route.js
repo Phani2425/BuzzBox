@@ -2,7 +2,7 @@ const {uploadProfileInstance,uploadAttachments} = require('../Config/multerConfi
 const { LoginController } = require('../Controllers/AuthController/LoginController');
 const { SignupController } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
-const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat } = require('../Controllers/ChatController/chat');
+const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat, getMessages } = require('../Controllers/ChatController/chat');
 const { ProfileController, SearchUser } = require('../Controllers/UserController/ProfileController');
 const { isAuthenticated } = require('../Middlewares/auth');
 
@@ -34,11 +34,14 @@ router.post('/message',isAuthenticated,uploadAttachments.array('files',10),sendA
 //chat related routes
 
 //when multiple controller have same route but different http methods we use route() method along with method chaining
-router.route('/chat/:id').get(isAuthenticated,getChatDetails).put(isAuthenticated,renameChat).delete(isAuthenticated,deleteChat);
+router.route('/:id').get(isAuthenticated,getChatDetails).put(isAuthenticated,renameChat).delete(isAuthenticated,deleteChat);
 
 //this is simmilar to :-
 // router.get('/chat/:id',A);
 // router.put('/chat/:id',A);
 // router.delete('/chat/:id',A);
+
+//router for fetching the messages of a chat
+router.get('/messages/:id',isAuthenticated,getMessages);
 
 module.exports = router;
