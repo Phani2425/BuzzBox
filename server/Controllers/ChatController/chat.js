@@ -405,7 +405,11 @@ exports.sendAttachments = async (req, resp) => {
 
 
             return new Promise((resolve, reject) => {
-                cloudinary.uploader.upload_stream({ resource_type: 'raw' }, (error, result) => {
+                cloudinary.uploader.upload_stream({
+                    folder: 'BuzzBox/Attachments', // Specify folder
+                    resource_type: resourceType, // Automatically detect file type
+                    use_filename: true // Preserve original filename
+                }, (error, result) => {
                     if (error) {
                         reject(error);
                     } else {
@@ -607,7 +611,7 @@ exports.deleteChat = async (req, resp) => {
                 try {
                     const result = await cloudinary.uploader.destroy(
                         attachment.public_id, 
-                        { resource_type: attachment.resource_type || 'raw' }
+                        { resource_type: attachment.resource_type }
                     );
 
                     console.log(`Attachment ${attachment.public_id} deletion result:`, result);
