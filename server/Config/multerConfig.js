@@ -1,5 +1,5 @@
 const multer = require('multer');
-const profileStorage = require('./cloudinary');
+const {profileStorage} = require('./cloudinary');
 
 //this was the multer instance used to upload profile images directly to the cludinary
 const uploadProfileInstance = multer({storage:profileStorage});

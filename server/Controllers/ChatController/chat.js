@@ -6,7 +6,7 @@ const { FETCH_CHAT, ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT } = require('../../
 const { emitEvent } = require('../../Utils/emitEvent');
 const { getOtherMember } = require('../../Utils/utilityFunctions');
 const Message = require('../../Models/Message');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('../../Config/cloudinary');
 
 //controller for creating new group
 exports.CreateNewGroup = async (req, resp) => {
@@ -390,12 +390,30 @@ exports.sendAttachments = async (req, resp) => {
 
         //now i will upload the attachments to the cloudinary
         const promises = req.files.map((file) => {
+
+            // Determine resource type
+            let resourceType = 'raw'; // default to raw
+            const mimetype = file.mimetype;
+
+            if (mimetype.startsWith('image/')) {
+                resourceType = 'image';
+            } else if (mimetype.startsWith('video/')) {
+                resourceType = 'video';
+            } else if (mimetype.startsWith('audio/')) {
+                resourceType = 'audio';
+            }
+
+
             return new Promise((resolve, reject) => {
                 cloudinary.uploader.upload_stream({ resource_type: 'raw' }, (error, result) => {
                     if (error) {
                         reject(error);
                     } else {
-                        resolve(result);
+                         // Include resource_type in the resolved result
+                            resolve({
+                                ...result,
+                                resource_type: resourceType
+                            });
                     }
                 }).end(file.buffer);
             })
@@ -424,7 +442,7 @@ exports.sendAttachments = async (req, resp) => {
         emitEvent(req, NEW_MESSAGE_ALERT, chat.members, { chatId });
 
         //the attachments needed to be formated to have the structure as defined in the message model
-        const formatedAttachments = attachments.map(({ public_id, secure_url }) => ({ public_id, url: secure_url }));
+        const formatedAttachments = attachments.map(({ public_id, secure_url,resource_type }) => ({resource_type,public_id, url: secure_url }));
 
         const messageForDb = {
             sender: req.user.id,
@@ -455,4 +473,189 @@ exports.sendAttachments = async (req, resp) => {
 
 //get messages
 
-//get chat details,rename,delete
+//get chat details
+
+exports.getChatDetails = async (req, resp) => {
+    //here it has two cases:- either there will be request to return chat details by populating the members or to not populate the members data
+    try {
+
+        if(req.query.populate === 'true'){
+
+            const chat = await Chat.findById(req.params.id).populate('members','userName profilePic');
+
+            if(!chat){
+                return resp.status(404).json({
+                    success:false,
+                    message:'chat not found'
+                })
+            }
+
+            return resp.status(200).json({
+                success:true,
+                chat,
+                message:'chat details fetched'
+            })
+
+        }else{
+            const chat = await Chat.findById(req.params.id);
+
+            if(!chat){
+                return resp.status(404).json({
+                    success:false,
+                    message:'chat not found'
+                })
+            }
+
+            return resp.status(200).json({
+                success:true,
+                chat,
+                message:'chat details fetched'
+            })
+        }
+
+    } catch (err) {
+        console.log('error occured while getting chat details', err.message);
+        resp.status(500).json({
+            success: false,
+            message: 'internal server error'
+        })
+    }
+}
+
+//controller for chat rename if it is a group chat
+exports. renameChat = async(req,resp) => {
+    try {
+        const chatId = req.params.id;
+        const {name} = req.body;
+
+        const chat = await Chat.findById(chatId);
+
+        if(!chat){
+            return resp.status(404).json({
+                success:false,
+                message:'chat not found'
+            })
+        }
+
+        if(!chat.groupChat){
+            return resp.status(400).json({
+                success:false,
+                message:'chat is not a group chat'
+            })
+        }
+
+        if(chat.creator.toString() !== req.user.id.toString()){
+            return resp.status(401).json({
+                success:false,
+                message:'you are not authorized to rename the chat'
+            })
+        }
+
+        chat.name = name;
+
+        const updatedChat = await chat.save();
+
+        emitEvent(req,FETCH_CHAT,chat.members);
+
+        emitEvent(req,ALERT,chat.members,`group name changed to ${name}`);
+
+        return resp.status(200).json({
+            success:true,
+            updatedChat,
+            message:'chat renamed'
+        })
+
+    } catch (err) {
+        console.log('error occured while renaming chat', err.message);
+        resp.status(500).json({
+            success:false,
+            message:'internal server error'
+        })
+    }
+}
+
+
+//chat delete
+
+exports.deleteChat = async (req, resp) => {
+    try {
+        const chat = await Chat.findById(req.params.id);
+
+        if (!chat) {
+            return resp.status(404).json({
+                success: false,
+                message: 'chat not found'
+            });
+        }
+
+        if (chat.creator.toString() !== req.user.id.toString()) {
+            return resp.status(401).json({
+                success: false,
+                message: 'you are not authorized to delete the chat'
+            });
+        }
+
+        // Find messages with attachments
+        const messages = await Message.find({ 
+            chat: req.params.id, 
+            attachments: { $exists: true, $not: { $size: 0 } } 
+        });
+
+        // Use Promise.all to handle attachment deletions properly
+        const attachmentDeletionPromises = messages.flatMap(message => 
+            message.attachments.map(async (attachment) => {
+                try {
+                    const result = await cloudinary.uploader.destroy(
+                        attachment.public_id, 
+                        { resource_type: attachment.resource_type || 'raw' }
+                    );
+
+                    console.log(`Attachment ${attachment.public_id} deletion result:`, result);
+                    return result;
+                } catch (error) {
+                    console.error(`Error deleting attachment ${attachment.public_id}:`, error);
+                    return null;
+                }
+            })
+        );
+
+        // Wait for all attachment deletion attempts to complete
+        const deletionResults = await Promise.allSettled(attachmentDeletionPromises);
+
+        // Optional: Log detailed results
+        const deletionSummary = {
+            total: deletionResults.length,
+            deleted: deletionResults.filter(r => 
+                r.status === 'fulfilled' && r.value && r.value.result === 'ok'
+            ).length,
+            notFound: deletionResults.filter(r => 
+                r.status === 'fulfilled' && r.value && r.value.result === 'not found'
+            ).length,
+            errors: deletionResults.filter(r => r.status === 'rejected').length
+        };
+
+        console.log('Attachment Deletion Summary:', deletionSummary);
+
+        // Delete messages associated with the chat
+        await Message.deleteMany({ chat: req.params.id });
+
+        // Delete the chat
+        await Chat.findByIdAndDelete(req.params.id);
+
+        // Notify chat members
+        emitEvent(req, ALERT, chat.members, `chat ${chat.name} deleted by admin`);
+
+        return resp.status(200).json({
+            success: true,
+            message: 'chat deleted',
+            attachmentDeletionSummary: deletionSummary
+        });
+
+    } catch (err) {
+        console.error('Error occurred while deleting chat', err);
+        resp.status(500).json({
+            success: false,
+            message: 'internal server error'
+        });
+    }
+};

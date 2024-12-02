@@ -12,6 +12,9 @@ const MessageSchema = new mongoose.Schema({
     },
     attachments: {
         type: [{
+            resource_type: {
+                type: String
+            },
             public_id: {
                 type: String
             },
