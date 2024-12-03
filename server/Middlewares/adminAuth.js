@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-exports.isAuthenticated = (req, res, next) => {
+exports.isAdminAuthenticated = (req, res, next) => {
     try {
         // Get token from multiple sources
         let token = req.cookies.token || 
@@ -16,7 +16,7 @@ exports.isAuthenticated = (req, res, next) => {
         }
 
         // Verify token
-        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        jwt.verify(token, process.env.ADMIN_JWT_SECRET, (err, _) => {
             if (err) {
                 return res.status(403).json({
                     success: false,
@@ -24,7 +24,6 @@ exports.isAuthenticated = (req, res, next) => {
                 });
             }
             
-            req.user = decoded;
             next();
         });
     } catch (error) {

@@ -5,6 +5,7 @@ const { SignupController } = require('../Controllers/AuthController/SignupContro
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
 const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat, getMessages } = require('../Controllers/ChatController/chat');
 const { ProfileController, SearchUser, sendFriendRequest, acceptFriendRequest, getRequests, rejectFriendRequest, getMyFriends, updateProfile } = require('../Controllers/UserController/ProfileController');
+const { isAdminAuthenticated } = require('../Middlewares/adminAuth');
 const { isAuthenticated } = require('../Middlewares/auth');
 
 const router = require('express').Router();
@@ -53,9 +54,9 @@ router.get('/messages/:id',isAuthenticated,getMessages);
 
 //router for admin controllers
 router.post('/admin/login',AdminLogin);
-router.get('/admin/getusers',getAllUsers);
-router.get('/admin/getchats',getAllChats);
-router.get('/admin/getmessages/:id',getAllMessages);
-router.get('/admin/getstats',getStats);
+router.get('/admin/getusers',isAdminAuthenticated,getAllUsers);
+router.get('/admin/getchats',isAdminAuthenticated,getAllChats);
+router.get('/admin/getmessages/:id',isAdminAuthenticated,getAllMessages);
+router.get('/admin/getstats',isAdminAuthenticated,getStats);
 
 module.exports = router;
