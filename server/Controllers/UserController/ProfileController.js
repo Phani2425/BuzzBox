@@ -23,6 +23,65 @@ exports.ProfileController = async (req, resp) => {
    }
 }
 
+//controller for updating the profile of the user
+exports.updateProfile = async (req, resp) => {
+   try {
+       const userId = req.user.id;
+
+       if (!userId) {
+           return resp.status(401).json({ error: 'unauthorized' });
+       }
+
+       const user = await User.findById(userId);
+       if (!user) {
+           return resp.status(404).json({ error: 'user not found' });
+       }
+
+       const { userName, bio } = req.body;
+       if (userName) user.userName = userName;
+       if (bio) user.bio = bio;
+       if (req.file) user.profilePic = req.file.path;
+
+       await user.save();
+
+       return resp.status(200).json({ success: true, user });
+
+   } catch (err) {
+       console.log('Error occurred while updating profile', err.message);
+       return resp.status(500).json({ error: 'internal server error' });
+   }
+};
+
+//controller for finding my friends
+exports.getMyFriends = async (req, resp) => {
+   try {
+      //fetch all the chats where i am a member
+      const singleChatMembers = await Chat.find({ groupChat: false, members: { $in: [req.user.id] } }, { members: 1 });
+
+      // console.log(singleChatMembers);
+
+      const friends = singleChatMembers.map(chat => chat.members.find(member => member._id.toString() !== req.user.id));
+
+      // console.log(friends);
+
+      //fetch all the users who are my friends
+      const users = await User.find({ _id: { $in: friends } }, { userName: 1, profilePic: 1 }).lean();
+
+      //return the response
+      resp.status(200).json({
+         success: true,
+         users
+      })
+
+   } catch (err) {
+      console.log('error occured while fetching friends', err.message);
+      resp.status(500).json({
+         success: false,
+         message: 'error occuered while fetching friends'
+      })
+   }
+}
+
 //controller for searching users
 
 //basically when the user clicks on the search button in the frontend then all the users which are not my friend will be shown there as the search field is empty and when user types anything then i will implement debouncing to find users with that username and show them in the search result
@@ -31,7 +90,7 @@ exports.SearchUser = async (req, resp) => {
    try {
 
       //fetching the username from query of url
-      const {userName} = req.body;
+      const { userName } = req.body;
       //ye username either empty hoga ya phir kuch likha hoga
       //agar empty hoga toh i will return all the users which are not my friend
       //agar kuch likha hoga toh i will return all the users which are not my friend and whose username matches the query
@@ -45,10 +104,10 @@ exports.SearchUser = async (req, resp) => {
       // console.log(friends);
 
       //fetch all the users which are not my friend
-      const users = await User.find({ _id: { $nin: friends } },{userName:1,profilePic:1}).lean();
+      const users = await User.find({ _id: { $nin: friends } }, { userName: 1, profilePic: 1 }).lean();
 
       //do some operations
-      if(userName.trim().length>0){
+      if (userName.trim().length > 0) {
          //if the username is not empty then filter the users whose username matches the query
          const filteredUsers = users.filter(user => user.userName.toLowerCase().includes(userName.toLowerCase()));
          //return response
@@ -78,171 +137,172 @@ exports.SearchUser = async (req, resp) => {
 
 //controller for fetching friend requests whic i recieved and i have sent to others and send these two information to the frontend so that it can show the requests in the frontend
 // Controller for fetching friend requests
-exports. getRequests = async (req, resp) => {
+exports.getRequests = async (req, resp) => {
    try {
-       const userId = req.user.id;
+      const userId = req.user.id;
 
-       // Fetch friend requests where the user is the receiver
-       const receivedRequests = await Request.find({ receiver: userId }).populate('sender', 'userName profilePic');
+      // Fetch friend requests where the user is the receiver
+      const receivedRequests = await Request.find({ receiver: userId }).populate('sender', 'userName profilePic');
 
-       // Fetch friend requests where the user is the sender
-       const sentRequests = await Request.find({ sender: userId }).populate('receiver', 'userName profilePic');
+      // Fetch friend requests where the user is the sender
+      const sentRequests = await Request.find({ sender: userId }).populate('receiver', 'userName profilePic');
 
-       // Send the requests to the frontend
-       return resp.status(200).json({
-           success: true,
-           receivedRequests,
-           sentRequests
-       });
+      // Send the requests to the frontend
+      return resp.status(200).json({
+         success: true,
+         receivedRequests,
+         sentRequests
+      });
 
    } catch (err) {
-       console.log('Error occurred while fetching friend requests', err.message);
-       return resp.status(500).json({
-           success: false,
-           message: 'Error occurred while fetching friend requests'
-       });
+      console.log('Error occurred while fetching friend requests', err.message);
+      return resp.status(500).json({
+         success: false,
+         message: 'Error occurred while fetching friend requests'
+      });
    }
 };
 
 // Controller for sending friend request
 exports.sendFriendRequest = async (req, resp) => {
-    try {
-        const { receiverId } = req.body;
-        const senderId = req.user.id;
+   try {
+      const { receiverId } = req.body;
+      const senderId = req.user.id;
 
-        // Check if a request already exists
-        const existingRequest = await Request.findOne({
+      // Check if a request already exists
+      const existingRequest = await Request.findOne({
          $or: [{
             sender: senderId,
             receiver: receiverId,
             status: 'pending'
-        },{
+         }, {
             sender: receiverId,
             receiver: senderId,
             status: 'pending'
-        }]
-        });
+         }]
+      });
 
-        if (existingRequest) {
-            return resp.status(400).json({
-                success: false,
-                message: 'Friend request already sent'
-            });
-        }
-
-        // Create a new friend request
-        const newRequest = await Request.create({
-            sender: senderId,
-            receiver: receiverId
-        });
-
-        emitEvent(req,NEW_REQUEST,[receiverId],'new Friend Request');
-
-        return resp.status(200).json({
-            success: true,
-            message: 'Friend request sent successfully',
-            request: newRequest
-        });
-
-    } catch (err) {
-        console.log('Error occurred while sending friend request', err.message);
-        resp.status(500).json({
+      if (existingRequest) {
+         return resp.status(400).json({
             success: false,
-            message: 'Error occurred while sending friend request'
-        });
-    }
+            message: 'Friend request already sent'
+         });
+      }
+
+      // Create a new friend request
+      const newRequest = await Request.create({
+         sender: senderId,
+         receiver: receiverId
+      });
+
+      emitEvent(req, NEW_REQUEST, [receiverId], 'new Friend Request');
+
+      return resp.status(200).json({
+         success: true,
+         message: 'Friend request sent successfully',
+         request: newRequest
+      });
+
+   } catch (err) {
+      console.log('Error occurred while sending friend request', err.message);
+      resp.status(500).json({
+         success: false,
+         message: 'Error occurred while sending friend request'
+      });
+   }
 };
 
 // Controller for accepting friend request
 exports.acceptFriendRequest = async (req, resp) => {
-    try {
+   try {
 
-        const receiverId = req.user.id;
-        const requestId = req.body.requestId;
+      const receiverId = req.user.id;
+      const requestId = req.body.requestId;
 
-        // Find the friend request
-        const friendRequest = await Request.findOne({
-            _id: requestId,
-            receiver: receiverId,
-            status: 'pending'
-        });
+      // Find the friend request
+      const friendRequest = await Request.findOne({
+         _id: requestId,
+         receiver: receiverId,
+         status: 'pending'
+      });
 
-        if (!friendRequest) {
-            return resp.status(404).json({
-                success: false,
-                message: 'Friend request not found'
-            });
-        }
-
-        // Update the status to accepted
-        friendRequest.status = 'accepted';
-        await friendRequest.save();
-
-        //create a chat between the two users
-         const chat = new Chat({
-               groupChat: false,
-               members: [friendRequest.sender, receiverId]});
-
-         await chat.save();
-
-         emitEvent(req,ACCEPT_REQUEST,[friendRequest.sender],`Friend Request Accepted by ${friendRequest.receiver}`);
-
-         //emit event to refetch chat to both user
-         emitEvent(req,FETCH_CHAT,[friendRequest.sender,receiverId]);
-
-        return resp.status(200).json({
-            success: true,
-            message: 'Friend request accepted successfully',
-            request: friendRequest
-        });
-
-    } catch (err) {
-        console.log('Error occurred while accepting friend request', err.message);
-        resp.status(500).json({
+      if (!friendRequest) {
+         return resp.status(404).json({
             success: false,
-            message: 'Error occurred while accepting friend request'
-        });
-    }
+            message: 'Friend request not found'
+         });
+      }
+
+      // Update the status to accepted
+      friendRequest.status = 'accepted';
+      await friendRequest.save();
+
+      //create a chat between the two users
+      const chat = new Chat({
+         groupChat: false,
+         members: [friendRequest.sender, receiverId]
+      });
+
+      await chat.save();
+
+      emitEvent(req, ACCEPT_REQUEST, [friendRequest.sender], `Friend Request Accepted by ${friendRequest.receiver}`);
+
+      //emit event to refetch chat to both user
+      emitEvent(req, FETCH_CHAT, [friendRequest.sender, receiverId]);
+
+      return resp.status(200).json({
+         success: true,
+         message: 'Friend request accepted successfully',
+         request: friendRequest
+      });
+
+   } catch (err) {
+      console.log('Error occurred while accepting friend request', err.message);
+      resp.status(500).json({
+         success: false,
+         message: 'Error occurred while accepting friend request'
+      });
+   }
 };
 
 //controller for rejecting friend request
-exports. rejectFriendRequest = async (req, resp) => {
-      try {
-   
-         const receiverId = req.user.id;
-         const requestId = req.body.requestId;
-   
-         // Find the friend request
-         const friendRequest = await Request.findOne({
-               _id: requestId,
-               receiver: receiverId,
-               status: 'pending'
-         });
-   
-         if (!friendRequest) {
-               return resp.status(404).json({
-                  success: false,
-                  message: 'Friend request not found'
-               });
-         }
-   
-         // Update the status to rejected
-         friendRequest.status = 'rejected';
-         await friendRequest.save();
-   
-         return resp.status(200).json({
-               success: true,
-               message: 'Friend request rejected successfully',
-               request: friendRequest
-         });
-   
-      } catch (err) {
-         console.log('Error occurred while rejecting friend request', err.message);
-         resp.status(500).json({
-               success: false,
-               message: 'Error occurred while rejecting friend request'
+exports.rejectFriendRequest = async (req, resp) => {
+   try {
+
+      const receiverId = req.user.id;
+      const requestId = req.body.requestId;
+
+      // Find the friend request
+      const friendRequest = await Request.findOne({
+         _id: requestId,
+         receiver: receiverId,
+         status: 'pending'
+      });
+
+      if (!friendRequest) {
+         return resp.status(404).json({
+            success: false,
+            message: 'Friend request not found'
          });
       }
+
+      // Update the status to rejected
+      friendRequest.status = 'rejected';
+      await friendRequest.save();
+
+      return resp.status(200).json({
+         success: true,
+         message: 'Friend request rejected successfully',
+         request: friendRequest
+      });
+
+   } catch (err) {
+      console.log('Error occurred while rejecting friend request', err.message);
+      resp.status(500).json({
+         success: false,
+         message: 'Error occurred while rejecting friend request'
+      });
+   }
 }
 
 // when an error occurs in an HTTP request, the response object is typically wrapped inside an error object. This is common when using libraries like Axios for making HTTP requests.
