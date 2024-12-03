@@ -1,5 +1,5 @@
 const {uploadProfileInstance,uploadAttachments} = require('../Config/multerConfig');
-const { getAllUsers, getAllChats } = require('../Controllers/AdminController/AdminControllers');
+const { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin } = require('../Controllers/AdminController/AdminControllers');
 const { LoginController } = require('../Controllers/AuthController/LoginController');
 const { SignupController } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
@@ -52,7 +52,10 @@ router.route('/:id').get(isAuthenticated,getChatDetails).put(isAuthenticated,ren
 router.get('/messages/:id',isAuthenticated,getMessages);
 
 //router for admin controllers
+router.post('/admin/login',AdminLogin);
 router.get('/admin/getusers',getAllUsers);
 router.get('/admin/getchats',getAllChats);
+router.get('/admin/getmessages/:id',getAllMessages);
+router.get('/admin/getstats',getStats);
 
 module.exports = router;
