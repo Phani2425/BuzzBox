@@ -3,7 +3,7 @@ const { LoginController } = require('../Controllers/AuthController/LoginControll
 const { SignupController } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
 const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat, getMessages } = require('../Controllers/ChatController/chat');
-const { ProfileController, SearchUser } = require('../Controllers/UserController/ProfileController');
+const { ProfileController, SearchUser, sendFriendRequest, acceptFriendRequest, getRequests, rejectFriendRequest } = require('../Controllers/UserController/ProfileController');
 const { isAuthenticated } = require('../Middlewares/auth');
 
 const router = require('express').Router();
@@ -18,6 +18,10 @@ router.post('/username', FindUniqueUserName);
 router.get('/profile',isAuthenticated,ProfileController); 
 //here in searchuser we are expecting a url like /user/search?name=phani  so while writing routes for it we only write the path part not the query part
 router.get('/user/search',isAuthenticated,SearchUser);
+router.get('/user/getrequests',isAuthenticated,getRequests);
+router.post('/user/sendrequest',isAuthenticated,sendFriendRequest);
+router.post('/user/acceptrequest',isAuthenticated,acceptFriendRequest);
+router.put('/user/rejectrequest',isAuthenticated,rejectFriendRequest);
 
 
 // //group related routes

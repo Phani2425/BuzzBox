@@ -14,6 +14,13 @@ exports.CreateNewGroup = async (req, resp) => {
 
         const { name, members } = req.body;
 
+        if(!name || !members){
+            return resp.status(422).json({
+                success:false,
+                message:'name and members are required'
+            })
+        }
+
         if (members.length < 2) {
             console.log('group can not be created with ;ess than 3 members');
             return resp.status(400).json({
@@ -173,6 +180,12 @@ exports.addMembers = async (req, resp) => {
             })
         }
 
+        if(!chatId){
+            return resp.status(422).json({
+                message:'chat id is required'
+            })
+        }
+
         //fetch the chat
         const chat = await Chat.findById(chatId);
 
@@ -238,6 +251,18 @@ exports.removeMember = async (req, resp) => {
 
         const { members, chatId } = req.body;
 
+        if (!members || members.length === 0) {
+            return resp.status(422).json({
+                message: 'select members to remove them'
+            })
+        }
+
+        if(!chatId){
+            return resp.status(422).json({
+                message:'chat id is required'
+            })
+        }
+
         const group = await Chat.findById(chatId);
         if (!group || !group.groupChat) {
             return resp.status(404).json({
@@ -291,6 +316,12 @@ exports.leaveGroup = async (req, resp) => {
     try {
         //i will get the chat id fro the dynamic url
         const chatId = req.params.id;
+
+        if (!chatId) {
+            return resp.status(422).json({
+                message: 'chat id is required'
+            })
+        }
 
         const chat = await Chat.findById(chatId);
         if (!chat) {
@@ -357,6 +388,13 @@ exports.sendAttachments = async (req, resp) => {
 
         //i need to send the chatid in the request body so that i can save the attachments to that chat document
         const { chatId } = req.body;
+
+        if (!chatId) {
+            return resp.status(422).json({
+                success: false,
+                message: 'chat id is required'
+            })
+        }
 
         //create an array of promises to find out the chat and the user requested to validate them
         const [chat, user] = await Promise.all([
@@ -529,6 +567,13 @@ exports. renameChat = async(req,resp) => {
     try {
         const chatId = req.params.id;
         const {name} = req.body;
+
+        if(!name){
+            return resp.status(422).json({
+                success:false,
+                message:'name is required'
+            })
+        }
 
         const chat = await Chat.findById(chatId);
 
@@ -712,7 +757,7 @@ exports. getMessages = async(req,resp) => {
             .lean(),
             Message.countDocuments({chat:chatId})]);
 
-            const totalPagesPossible = Math.ceil(messageCount/limit);
+            const totalPagesPossible = Math.ceil(messageCount/limit) || 0;
 
         //i will be sending the total number of messages and the messages fetched in this api
         resp.status(200).json({

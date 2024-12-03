@@ -26,6 +26,8 @@ app.get('/',(_,resp) => {
 
 connectToDatabase();
 
+//database seeding functions
+
 // createFakeUser(20);
 // singleChatSeeder('674e0f64a9090787c28131da',10);
 // groupChatSeeder('674e0f64a9090787c28131da',10);
