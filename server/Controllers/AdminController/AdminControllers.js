@@ -9,10 +9,13 @@ const Request = require('../../Models/Requests');
 const Message = require('../../Models/Message');
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 //controller for admin to login into the admin panel
 
 //in this controller there is no database operation still i will use async await and try catch block as i will create a token when the admin logs in and that process should be asyncronus
+
+//but i was wrong the project is synchronus
 const AdminLogin =  (req, resp) => {
     try {
 
@@ -34,7 +37,7 @@ const AdminLogin =  (req, resp) => {
         }
 
         //if they matched then i will create a token and send that to the admin in cookie
-        const token = jwt.sign({}, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({}, process.env.ADMIN_JWT_SECRET, { expiresIn: '1d' });
 
         resp.cookie('admintoken',token,{
             httpOnly:true,
@@ -43,7 +46,8 @@ const AdminLogin =  (req, resp) => {
 
         resp.status(200).json({
             success: true,
-            message: 'Admin logged in successfully'
+            message: 'Admin logged in successfully',
+            token
         })
 
     } catch (err) {

@@ -5,7 +5,7 @@ require('dotenv').config();
 const cors =  require('cors');
 const cookieParser = require('cookie-parser');
 const router = require('./Routes/route');
-const { messageSeeder, singleChatSeeder, groupChatSeeder } = require('./seeders/chatseed');
+// const { messageSeeder, singleChatSeeder, groupChatSeeder } = require('./seeders/chatseed');
 // const { createFakeUser } = require('./seeders/userseed');
 
 

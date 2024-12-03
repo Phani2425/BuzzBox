@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 exports.isAdminAuthenticated = (req, res, next) => {
     try {
         // Get token from multiple sources
-        let token = req.cookies.token || 
+        let token = req.cookies.admintoken || 
                    (req.headers('authorization') && req.headers('authorization').replace('Bearer ', '')) || 
-                   req.body.token;
+                   req.body.admintoken;
 
         // Check if token exists
         if (!token) {
