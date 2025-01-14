@@ -28,7 +28,9 @@ createRoot(document.getElementById("root")!).render(
   <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
     <HelmetProvider>
       <Provider store={store}>
+        <div onContextMenu={(e) => e.preventDefault()}>
         <App />
+        </div>
         <Toaster/>
       </Provider>
     </HelmetProvider>

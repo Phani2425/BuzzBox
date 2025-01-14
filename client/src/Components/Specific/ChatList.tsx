@@ -1,16 +1,8 @@
 import React from "react";
 import Chatitem from "../Shared/Chatitem";
+import { chatList } from "@/Types/types";
 
-interface chatList {
-    w?: string;
-    chats?: string[];
-    chatId?: string;
-    onlineUsers?: any[];
-    newMessagesAlert?: any[];
-    handleDeleteChat?: any;
-}
-
-const ChatList:React.FC<chatList> = ({
+const ChatList: React.FC<chatList> = ({
   w = "100%",
   chats = [],
   chatId,
@@ -23,15 +15,37 @@ const ChatList:React.FC<chatList> = ({
   ],
   handleDeleteChat,
 }) => {
-  return <div className={`w-[${w}] flex flex-col`}>
+  return (
+    <div className={`w-[${w}] flex flex-col`}>
+      {chats.map((chat, index) => {
+        // first we will destructure thr data from the chat object
+        const { avatar, _id, name, groupChat, members } = chat;
+        const newMessageAlert = newMessagesAlert.find(
+          (alert) => alert.chatId === _id
+        );
 
-    {
-        chats.map((chat, index) => {
-            return <Chatitem/>
-        })
-    }
+        const isOnline = members?.some((member: string) =>
+          onlineUsers.includes(member)
+        );
 
-  </div>;
+        return (
+          <Chatitem
+            newMessageAlert={newMessageAlert}
+            isOnline={isOnline}
+            avatar={avatar}
+            name={name}
+            groupChat={groupChat}
+            members={members}
+            _id={_id}
+            key={_id}
+            sameSender={chatId === _id}
+            handleDeleteChat={handleDeleteChat}
+            index={index}
+          />
+        );
+      })}
+    </div>
+  );
 };
 
 export default ChatList;

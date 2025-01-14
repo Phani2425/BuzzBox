@@ -18,7 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
-import { lazy, useState } from "react";
+import { lazy, useState, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/main";
 import { setToken, setUser } from "@/redux/slices/authSlice";
@@ -188,9 +188,16 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        {isSearch && <Searchcomp />}
-        {isNewGroup && <NewGroup />}
-        {isNotification && <Notification />}
+        {<Suspense fallback={<div className="p-4">Loading...</div>}>
+          {isSearch && <Searchcomp />}
+        </Suspense>}
+        {<Suspense fallback={<div className="p-4">Loading...</div>}>
+          {isNewGroup && <NewGroup />}
+        </Suspense>
+        }
+        {<Suspense fallback={<div className="p-4">Loading...</div>}>
+          {isNotification && <Notification />}
+        </Suspense>}
       </div>
     </header>
   );

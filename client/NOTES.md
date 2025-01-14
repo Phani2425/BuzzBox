@@ -22,3 +22,12 @@
  10. clearInterval and clearTimeout, useCallback, how to use zod in frontend?????
 
  11. type of stateChange function in typescript:- "React.Dispatch<React.SetStateAction<type of state>>;"
+
+ 12. usage of lazy and suspense when we want to load the component lazily and also want to show a loader while the component is loading.using suspense tag is important because when we import a component throght lazy loading then it loads the component only when it is required and does it asynchronously .so it is mandatory for us to show something while the component is getting loaded thats why react package provides us a tag and an attribute of that tag which are:-  <Suspense fallback={<Loader />}> <Component /> </Suspense> here Loader is the component which we want to show while the component is getting loaded.
+
+ 13. find and some function, memo() function why is it used??? because there is rule in react that when a parent component gget rerender then all its child component also get rerendered so to avoid that while exporting the child component we export that by putting it in the memo function so that  the child component only changes when the props passed to child component from parent get changes otherwise it gets memoised and do not get re-rendered.
+
+ 14. onContextMenu sikhili. basically this is the event listner for right click on the element. if we want to disable right click for the whole page then we have to use this event listner on the body tag of the page.or in react we need to wrap the app component in a dev in which we will use this event listner.nad in that we will prevent the default behaviour of the event.
+
+ 15. here for deelting the chat we implemented such event listner on right click on the chat
+
