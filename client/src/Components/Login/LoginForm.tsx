@@ -101,7 +101,7 @@ const LoginForm: React.FC<loginProp> = ({ setLogin }) => {
               className="py-2 px-3 placeholder:text-slate-700 bg-transparent border-slate-700 focus-within:outline-none rounded-lg border text-white w-full"
               onChange={changehandler}
             />
-          </div>
+          </div> 
 
           <div className="flex flex-col gap-2 items-start">
             <label className="text-white" htmlFor="password">

@@ -7,6 +7,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import combinedReducer from "../src/redux/reducerCombiner";
 import { Toaster } from "./components/ui/toaster.tsx";
+import { ClerkProvider } from '@clerk/clerk-react'
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key")
+}
+
+
 
 //configuring the redux store
 const store = configureStore({
@@ -17,11 +25,13 @@ export type RootState = ReturnType<typeof store.getState>;
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
     <HelmetProvider>
       <Provider store={store}>
         <App />
         <Toaster/>
       </Provider>
     </HelmetProvider>
+    </ClerkProvider>
   </BrowserRouter>
 );

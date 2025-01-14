@@ -9,6 +9,10 @@ import { z } from "zod";
 import { authEndpoints } from "@/Service/apis";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
+import { useSignIn } from "@clerk/clerk-react";
+import { useDispatch } from "react-redux";
+import {setUser, setToken} from "@/redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 interface Form {
   email: string;
@@ -19,6 +23,9 @@ interface Form {
 const Login = () => {
   const { toast } = useToast();
 
+  const { signIn } = useSignIn();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [image, setimage] = useState("");
   const [previewimge, setpreviewimage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -43,9 +50,9 @@ const Login = () => {
 
   //function that will get called when user stops typing for some seconds
   //deboucing
+
   const checkUserName = async () => {
     try {
-      console.log("checking");
       const response = await connectToApi("POST", authEndpoints.userName, {
         userName: formdata.userName,
       });
@@ -102,6 +109,8 @@ const Login = () => {
       form.append("image", image);
       if (userNameUnique) {
         form.append("userName", formdata.userName);
+      } else {
+        throw new Error("Username is not unique");
       }
 
       //make api call and submit
@@ -134,6 +143,55 @@ const Login = () => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const result = await signIn?.authenticateWithSocial({
+        strategy: "oauth_google",
+        redirectUrl: "/",
+        redirectUrlComplete: "/",
+      });
+
+      if (result.status === "complete") {
+        const { firstName, lastName, emailAddress, imageUrl } = result.userData;
+
+        // Send data to your backend
+        const response = await connectToApi("POST", "/api/v1/oauth/signup", {
+          email: emailAddress,
+          firstName,
+          lastName,
+          imageUrl,
+        });
+
+        if (response) {
+          dispatch(setUser(response.data.user));
+          dispatch(setToken(response.data.token));
+          localStorage.setItem("User", JSON.stringify(response.data.user));
+          localStorage.setItem("token", response.data.token);
+          navigate('/');
+        }
+      }
+    } catch (err) {
+      console.error("Error signing in with Google", err);
+      toast({
+        title: "Error",
+        description: "Failed to sign in with Google",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const signInWithGithub = async () => {
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_github",
+        redirectUrl: "/",
+        redirectUrlComplete: "/",
+      });
+    } catch (err) {
+      console.error("Error signing in with GitHub", err);
+    }
+  };
+
   return (
     <div className="h-screen w-screen bg-[url('./bg.png')] flex justify-center items-center">
       {login ? (
@@ -148,13 +206,19 @@ const Login = () => {
               Create an Account
             </h1>
             <div className="flex gap-2 items-center">
-              <Button className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4">
+              <Button
+                className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4"
+                onClick={signInWithGoogle}
+              >
                 <img src="./google.png" className="w-4" />
                 Google
               </Button>
-              <Button className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4">
+              <Button
+                className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4"
+                onClick={signInWithGithub}
+              >
                 <img src="./facebook.png" className="w-4" />
-                Facebook
+                GitHub
               </Button>
             </div>
           </div>
