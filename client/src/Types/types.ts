@@ -26,3 +26,18 @@ export interface chatList {
     }[];
     handleDeleteChat?: any;
 }
+
+export interface User {
+    id: string;
+    username: string;
+    avatar: string;
+   
+}
+
+export interface Notifiaction {
+    sender:{
+        avatar: string,
+        name: string
+    },
+    _id: string
+}

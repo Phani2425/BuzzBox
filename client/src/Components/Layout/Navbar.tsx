@@ -58,7 +58,7 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const logOutHandler = () => {
     toast({
       description: "Logged Out",
-    })
+    });
     localStorage.clear();
     dispatch(setUser(null));
     dispatch(setToken(null));
@@ -188,16 +188,36 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
             </Tooltip>
           </TooltipProvider>
         </div>
-        {<Suspense fallback={<div className="p-4">Loading...</div>}>
-          {isSearch && <Searchcomp />}
-        </Suspense>}
-        {<Suspense fallback={<div className="p-4">Loading...</div>}>
-          {isNewGroup && <NewGroup />}
-        </Suspense>
+        {
+          <Suspense fallback={<div className="p-4">Loading...</div>}>
+            {isSearch && (
+              <Searchcomp
+                isOpen={isSearch}
+                onClose={() => setisSearch(false)}
+              />
+            )}
+          </Suspense>
         }
-        {<Suspense fallback={<div className="p-4">Loading...</div>}>
-          {isNotification && <Notification />}
-        </Suspense>}
+        {
+          <Suspense fallback={<div className="p-4">Loading...</div>}>
+            {isNewGroup && (
+              <NewGroup
+                isOpen={isNewGroup}
+                onClose={() => setisNewGroup(false)}
+              />
+            )}
+          </Suspense>
+        }
+        {
+          <Suspense fallback={<div className="p-4">Loading...</div>}>
+            {isNotification && (
+              <Notification
+                isOpen={isNotification}
+                onClose={() => setisNotification(false)}
+              />
+            )}
+          </Suspense>
+        }
       </div>
     </header>
   );

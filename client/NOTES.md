@@ -31,3 +31,9 @@
 
  15. here for deelting the chat we implemented such event listner on right click on the chat
 
+ 16. disabled attribute of button, type of function can be :- "Function" but we need to specify the type of the function like this:- "type function = (arg: type) => void" it  is more prefered to specify the type of the function.
+
+ 17. array.form() method is used to convert the array like object into an array. it is used like this:- Array.from(arrayLikeObject). for example:- Array.from(document.querySelectorAll('div')) this will convert the array like object into an array of divs.
+
+ 18. alt+shift+o is used to organise the imports in the file.
+

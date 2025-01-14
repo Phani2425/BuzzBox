@@ -19,16 +19,20 @@ const AppLayout =
 
       const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
-      const handledeleteChat = (e:React.MouseEvent<HTMLDivElement>, _id:string, groupChat:boolean ) => {
+      const handledeleteChat = (
+        e: React.MouseEvent<HTMLDivElement>,
+        _id: string,
+        groupChat: boolean
+      ) => {
         e.preventDefault();
-        if(groupChat) console.log("Delete Group Chat", _id);
-        else{
+        if (groupChat) console.log("Delete Group Chat", _id);
+        else {
           console.log("Delete Chat", _id);
         }
-      }
+      };
 
       return (
-        <div className="relative min-h-screen overflow-hidden bg-black">
+        <div className="relative min-h-screen overflow-hidden bg-black ">
           <div
             className="pointer-events-none absolute inset-0 opacity-20"
             style={{
@@ -49,7 +53,7 @@ const AppLayout =
               isMobileMenuOpen={isMobileMenuOpen}
               setIsMobileMenuOpen={setIsMobileMenuOpen}
             />
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] gap-6 h-[calc(100%-2rem)] mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] gap-6 h-[calc(100%-2rem)] mt-8 ">
               {/* Left section */}
               <div
                 className={`hidden md:block glassmorphism rounded-2xl ${
@@ -65,9 +69,9 @@ const AppLayout =
                       count: 5,
                     },
                     {
-                        chatId: "2",
-                        count:3
-                    }
+                      chatId: "2",
+                      count: 3,
+                    },
                   ]}
                   onlineUsers={["3", "4"]}
                   handleDeleteChat={handledeleteChat}
@@ -87,7 +91,7 @@ const AppLayout =
               </div>
 
               <div className="hidden lg:block glassmorphism rounded-2xl">
-                <Profile/>
+                <Profile />
               </div>
             </div>
           </div>

@@ -4,40 +4,33 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusCircle } from "lucide-react";
 import UserItem from "../Shared/UserItem";
+import { useState } from "react";
+import { User } from "@/Types/types";
+import { Sampleusers } from "@/constants/sampleData";
 
-const users = [
-  {
-    id: 1,
-    username: "rombor",
-    avatar: "https://avatars",
-  },
-  {
-    id: 2,
-    username: "phani",
-    avatar: "https://avatars",
-  },
-  {
-    id: 3,
-    username: "bhusan",
-    avatar: "https://avatars",
-  },
-  {
-    id: 4,
-    username: "mohanty",
-    avatar: "https://avatars",
-  },
-];
+const Search = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  const [isFriendRequestSent, setIsFriendRequestSent] =
+    useState<boolean>(false);
+  const [users, setusers] = useState<User[]>(Sampleusers);
 
-const Search = () => {
+  const sendFriendRequest = (id: string) => {
+    console.log(id);
+    setIsFriendRequestSent(true);
+  };
+
   return (
-    <Dialog open={true}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Search Users</DialogTitle>
@@ -53,10 +46,15 @@ const Search = () => {
           <Input id="username" placeholder="rombor" className="col-span-3" />
         </div>
 
-        <div>
+        <div className="flex flex-col gap-4 items-start">
           {users &&
             users.map((user) => (
-              <UserItem user={user} handler={() => {}} handlerLoading={false} />
+              <UserItem
+                key={user.id}
+                user={user}
+                handler={sendFriendRequest}
+                handlerLoading={isFriendRequestSent}
+              />
             ))}
         </div>
       </DialogContent>
