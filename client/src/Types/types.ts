@@ -41,3 +41,24 @@ export interface Notifiaction {
     },
     _id: string
 }
+
+interface Attachment {
+    public_id: string;
+    url: string;
+  }
+  
+  interface MessageSender {
+    _id: string;
+    username: string;
+  }
+  
+  interface Message {
+    attachments?: Attachment[];
+    content: string;
+    _id: string;
+    sender: MessageSender;
+    chat: string;
+    createdAt: string;
+  }
+  
+  export type { Message, Attachment, MessageSender };

@@ -6,7 +6,9 @@
 
 3. what does react-helmet-async package do and why do we use that???
 
-4. revised the complete workflow of the redux-toolkit in which we use:- createSlice, combinereducers, configureStore, Provider, useDispatch, useSelector etc. once try to remeber from which package these are coming from. and try to remember the syntax of  the congfigureStore and createSlice.
+
+
+ 4. revised the complete workflow of the redux-toolkit in which we use:- createSlice, combinereducers, configureStore, Provider, useDispatch, useSelector etc. once try to remeber from which package these are coming from. and try to remember the syntax of  the congfigureStore and createSlice.
 
  also most important thing is state of a react-store is used by useselectors and if we are using typescript then we have to define the  type of the state so what we do is :-  we  export the type of state by:- export type RootState = ReturnType<typeof store.getState> and then we use this type in the useSelector hook like this:- const state = useSelector((state: RootState) => state.reducerName)
 
@@ -37,3 +39,19 @@
 
  18. alt+shift+o is used to organise the imports in the file.
 
+19. what is a fragment tagb and how many ways it can be written??? <> and <Fragment>
+
+20. empty strinng is a falsy value .reember all other  falsy values
+
+21. ek baar ise dekhna hai:-scrollbar-hide  in index.css :- ye kaise implement hua hai
+
+22. .toLocaleTimeString([], {...}):
+
+This method converts the Date object to a string representing the time portion in a human-readable format, based on the locale settings.
+The first argument [] is an array of locales. An empty array means it will use the default locale.
+The second argument is an options object that specifies how the time should be formatted.
+Options Object:
+
+{ hour: "2-digit", minute: "2-digit" }:
+hour: "2-digit": This formats the hour part of the time as a two-digit number (e.g., "01", "12").
+minute: "2-digit": This formats the minute part of the time as a two-digit number (e.g., "05", "30").

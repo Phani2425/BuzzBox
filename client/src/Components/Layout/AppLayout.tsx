@@ -32,7 +32,7 @@ const AppLayout =
       };
 
       return (
-        <div className="relative min-h-screen overflow-hidden bg-black ">
+        <div className="relative min-h-screen overflow-hidden bg-white dark:bg-black ">
           <div
             className="pointer-events-none absolute inset-0 opacity-20"
             style={{
@@ -41,7 +41,7 @@ const AppLayout =
           />
 
           <div
-            className="pointer-events-none absolute left-1/2 bottom-0 w-[800px] h-[800px] -translate-x-1/2 translate-y-1/2 bg-[#1d4ed8] opacity-30 rounded-full"
+            className="pointer-events-none absolute left-1/2 bottom-0 w-[800px] h-[800px] -translate-x-1/2 translate-y-1/2 bg-green-400 dark:bg-[#1d4ed8] opacity-30 rounded-full"
             style={{
               filter: "blur(100px)",
               animation: "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
@@ -81,12 +81,12 @@ const AppLayout =
               <div
                 className={`fixed inset-y-0 left-0 transform ${
                   isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-                } md:hidden transition duration-200 ease-in-out z-40 w-64 bg-black/80 backdrop-blur-xl backdrop-saturate-150 overflow-y-auto`}
+                } md:hidden transition duration-200 ease-in-out z-40 w-64 bg-white/80 dark:bg-black/80 backdrop-blur-xl backdrop-saturate-150 overflow-y-auto`}
               >
                 <div className="p-6">Mobile Menu Content</div>
               </div>
 
-              <div className="col-span-2 md:col-span-1 glassmorphism rounded-2xl">
+              <div className="col-span-2 md:col-span-1 glassmorphism rounded-2xl ">
                 <WrappedComponent {...props} />
               </div>
 

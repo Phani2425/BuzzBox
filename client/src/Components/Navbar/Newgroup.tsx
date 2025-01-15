@@ -1,6 +1,5 @@
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -48,7 +47,7 @@ const Newgroup = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}  >
       <DialogTrigger asChild>
         {/* <Button variant="outline">Share</Button> */}
       </DialogTrigger>
@@ -96,7 +95,7 @@ const Newgroup = ({
           </Button>
           <Button
             type="button"
-            className="w-full bg-red-500/90 border-2 border-red-400 hover:bg-red-500 font-semibold"
+            className="w-full bg-red-500/90 border-2 border-red-400 hover:bg-red-500 font-semibold" onClick={onClose}
           >
             Close
           </Button>

@@ -36,13 +36,11 @@ const ProfileCard = ({
   heading: string;
 }) => {
   return (
-    <div className="flex gap-4 items-center">
-      {Icon && <Icon className="text-white" />}
-      <div className="flex items-center text-white text-center gap-4">
-        <div className="flex flex-col gap-1">
-          <p>{text}</p>
-          <p className="text-gray-500">{heading}</p>
-        </div>
+    <div className="flex gap-4 items-start">
+      {Icon && <Icon size={20} className="mt-1" />}
+      <div className="flex flex-col gap-1 text-center">
+        <p>{text}</p>
+        <p className="text-gray-500">{heading}</p>
       </div>
     </div>
   );
