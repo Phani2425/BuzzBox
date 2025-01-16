@@ -33,6 +33,7 @@ const FindFileType = (url = "") => {
 
 const transformImage = (url = "", size = 200) => {
   return url;
+  console.log(size);
 }
 
 export { FindFileType, transformImage };

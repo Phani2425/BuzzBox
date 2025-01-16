@@ -55,3 +55,5 @@ Options Object:
 { hour: "2-digit", minute: "2-digit" }:
 hour: "2-digit": This formats the hour part of the time as a two-digit number (e.g., "01", "12").
 minute: "2-digit": This formats the minute part of the time as a two-digit number (e.g., "05", "30").
+
+23. learnt two way for implementing a featre where the modal gets closed when i click outside of it. 1st way:- in the inner div attach the ref and add stop Propagtion in click event and add eventlistner in outr div . and in function cehck that if the event target is the outer div then close the modal. 2nd way:- use the useRef hook and attach the ref to the outer div and add event listner to the document and check if the event target is the outer div then close the modal.

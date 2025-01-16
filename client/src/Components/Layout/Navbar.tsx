@@ -89,7 +89,7 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-b-gray-300 dark:border-zinc-800 bg-white dark:bg-black/50 backdrop-blur-xl">
-      <div className="flex h-16 items-center px-4">
+      <div className="flex h-16 items-center justify-between px-1 md:px-4">
         <div className="hidden md:flex items-center gap-2">
           <MessageSquare className="h-8 w-8 text-green-400 dark:text-[#00A3FF] [filter:drop-shadow(0_0_8px_rgba(0,163,255,0.5))]" />
           <span className="bg-gradient-to-r from-green-400 to-green-600 dark:from-[#00A3FF] dark:to-blue-600 bg-clip-text text-3xl font-bold text-transparent [text-shadow:0_0_15px_rgba(0,163,255,0.3)]">
@@ -104,12 +104,12 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1 md:gap-2">
           {/* button for light and dark mode */}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="ghost" size="icon" className="text-zinc-400">
                 <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 <span className="sr-only">Toggle theme</span>
@@ -151,8 +151,8 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-zinc-400 "
                   onClick={newgrouphandler}
+                  className="hidden md:flex items-center justify-center text-zinc-400  "
                 >
                   <UserPlus className="h-5 w-5" />
                   <span className="sr-only">Create Group</span>
