@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Moon, Sun } from "lucide-react";
@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/ui/theme-provider";
+import { setAdmin } from "@/redux/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const AdminLogin = () => {
   const [secretKey, setSecretKey] = useState("");
@@ -19,14 +21,26 @@ const AdminLogin = () => {
   const { toast } = useToast();
   const { setTheme } = useTheme();
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const admin = localStorage.getItem("Admin");
+    if (admin) {
+      navigate("/admin/dashboard");
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY;
-      
+
       if (secretKey === ADMIN_KEY) {
+        localStorage.setItem("Admin", "true");
+        dispatch(setAdmin(true));
+
         toast({
           description: "Admin Login Successful",
         });
@@ -39,19 +53,19 @@ const AdminLogin = () => {
         });
       }
     } catch (error) {
-     if(error instanceof Error){
-       toast({
-         variant: "destructive",
-         title: "Error",
-         description: error.message,
-       });
-     }else{
-         toast({
-            variant: "destructive",
-            title: "Error",
-            description: "An error occurred",
-         });
-     }
+      if (error instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "An error occurred",
+        });
+      }
     } finally {
       setLoading(false);
       setSecretKey("");

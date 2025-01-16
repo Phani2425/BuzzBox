@@ -1,25 +1,21 @@
-
-import { useSelector } from 'react-redux';
-import {RootState} from '../../main'
-import { Navigate } from 'react-router-dom';
-
+import { useSelector } from "react-redux";
+import { RootState } from "../../main";
+import { Navigate } from "react-router-dom";
 
 interface props {
-
-    children:React.ReactNode;
-    redirect:string
+  children: React.ReactNode;
+  redirect: string;
+  role: string;
 }
 
-const RouteProtector:React.FC<props> = ({children,redirect}) => {
+const RouteProtector: React.FC<props> = ({ children, redirect, role }) => {
+  const { user, admin } = useSelector((state: RootState) => state.auth);
 
-    const {user} = useSelector((state:RootState) => state.auth)
+  if (role === "user" && !user) return <Navigate to={redirect} />;
 
-    if (!user) {
-        return <Navigate to={redirect} />;
-    }
+  if (role === "admin" && !admin) return <Navigate to={redirect} />;
 
-    return children;
-     
-}
+  return children;
+};
 
-export default RouteProtector
+export default RouteProtector;
