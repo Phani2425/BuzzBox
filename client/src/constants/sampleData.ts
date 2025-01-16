@@ -1,5 +1,6 @@
 import { Message } from "@/Types/types";
 
+
 export const SampleChats = [
     {
         avatar: ['https://www.w3schools.com/howto/img_avatar.png'],
@@ -185,3 +186,94 @@ export const sampleNotifications = [
         createdAt: "2024-03-15T10:03:00.000Z"
     },
 ];
+
+export const groups = [
+    {
+      id: "1",
+      name: "Project Alpha",
+      creator: "1",
+      members: [
+        { id: "1", name: "John Doe", avatar: "https://ui-avatars.com/api/?name=John+Doe" },
+        { id: "2", name: "Jane Smith", avatar: "https://ui-avatars.com/api/?name=Jane+Smith" },
+        { id: "3", name: "Bob Wilson", avatar: "https://ui-avatars.com/api/?name=Bob+Wilson" }
+      ],
+      avatar: "https://ui-avatars.com/api/?name=Project+Alpha",
+      lastActive: "2 mins ago"
+    },
+    {
+      id: "2",
+      name: "Family Group",
+      creator: "2",
+      members: [
+        { id: "1", name: "John Doe", avatar: "https://ui-avatars.com/api/?name=John+Doe" },
+        { id: "4", name: "Mary Johnson", avatar: "https://ui-avatars.com/api/?name=Mary+Johnson" },
+        { id: "5", name: "David Brown", avatar: "https://ui-avatars.com/api/?name=David+Brown" },
+        { id: "6", name: "Sarah Davis", avatar: "https://ui-avatars.com/api/?name=Sarah+Davis" }
+      ],
+      avatar: "https://ui-avatars.com/api/?name=Family+Group",
+      lastActive: "5 mins ago"
+    },
+    {
+      id: "3",
+      name: "Gaming Squad",
+      creator: "1",
+      members: [
+        { id: "1", name: "John Doe", avatar: "https://ui-avatars.com/api/?name=John+Doe" },
+        { id: "7", name: "Mike Gaming", avatar: "https://ui-avatars.com/api/?name=Mike+Gaming" },
+        { id: "8", name: "Alex Pro", avatar: "https://ui-avatars.com/api/?name=Alex+Pro" }
+      ],
+      avatar: "https://ui-avatars.com/api/?name=Gaming+Squad",
+      lastActive: "1 hour ago"
+    },
+    {
+      id: "4",
+      name: "Work Team",
+      creator: "3",
+      members: [
+        { id: "1", name: "John Doe", avatar: "https://ui-avatars.com/api/?name=John+Doe" },
+        { id: "9", name: "Emma White", avatar: "https://ui-avatars.com/api/?name=Emma+White" },
+        { id: "10", name: "James Black", avatar: "https://ui-avatars.com/api/?name=James+Black" },
+        { id: "11", name: "Lisa Green", avatar: "https://ui-avatars.com/api/?name=Lisa+Green" },
+        { id: "12", name: "Tom Brown", avatar: "https://ui-avatars.com/api/?name=Tom+Brown" }
+      ],
+      avatar: "https://ui-avatars.com/api/?name=Work+Team",
+      lastActive: "3 hours ago"
+    },
+    {
+      id: "5",
+      name: "College Friends",
+      creator: "1",
+      members: [
+        { id: "1", name: "John Doe", avatar: "https://ui-avatars.com/api/?name=John+Doe" },
+        { id: "13", name: "Ryan Cool", avatar: "https://ui-avatars.com/api/?name=Ryan+Cool" },
+        { id: "14", name: "Kate Swift", avatar: "https://ui-avatars.com/api/?name=Kate+Swift" }
+      ],
+      avatar: "https://ui-avatars.com/api/?name=College+Friends",
+      lastActive: "1 day ago"
+    },
+    {
+      id: "6",
+      name: "Book Club",
+      creator: "4",
+      members: [
+        { id: "1", name: "John Doe", avatar: "https://ui-avatars.com/api/?name=John+Doe" },
+        { id: "15", name: "Anna Read", avatar: "https://ui-avatars.com/api/?name=Anna+Read" },
+        { id: "16", name: "Paul Page", avatar: "https://ui-avatars.com/api/?name=Paul+Page" },
+        { id: "17", name: "Lucy Books", avatar: "https://ui-avatars.com/api/?name=Lucy+Books" }
+      ],
+      avatar: "https://ui-avatars.com/api/?name=Book+Club",
+      lastActive: "2 days ago"
+    },
+    {
+      id: "7",
+      name: "Fitness Group",
+      creator: "1",
+      members: [
+        { id: "1", name: "John Doe", avatar: "https://ui-avatars.com/api/?name=John+Doe" },
+        { id: "18", name: "Jim Fit", avatar: "https://ui-avatars.com/api/?name=Jim+Fit" },
+        { id: "19", name: "Helen Health", avatar: "https://ui-avatars.com/api/?name=Helen+Health" }
+      ],
+      avatar: "https://ui-avatars.com/api/?name=Fitness+Group",
+      lastActive: "1 week ago"
+    }
+  ];

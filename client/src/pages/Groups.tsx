@@ -26,8 +26,8 @@ import { Label } from "@/components/ui/label";
 import { User } from "@/Types/types";
 import { Sampleusers } from "@/constants/sampleData";
 import UserItemForGroup from "@/Components/Shared/UserItemForGroup";
-import { useToast } from "@/hooks/use-toast"
-
+import { useToast } from "@/hooks/use-toast";
+import { groups } from "../constants/sampleData";
 
 const Groups = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,143 +40,6 @@ const Groups = () => {
     name: "John Doe",
     isAdmin: true,
   };
-
-  // Sample data
-  const groups = [
-    {
-      id: "1",
-      name: "Project Team",
-      creator: "1", // matches currentUser.id
-      members: [
-        {
-          id: "1",
-          name: "John Doe",
-          avatar: "https://ui-avatars.com/api/?name=John+Doe",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-        },
-      ],
-      avatar: "https://ui-avatars.com/api/?name=Project+Team",
-      lastActive: "2 mins ago",
-    },
-    {
-      id: "1",
-      name: "Project Team",
-      creator: "1", // matches currentUser.id
-      members: [
-        {
-          id: "1",
-          name: "John Doe",
-          avatar: "https://ui-avatars.com/api/?name=John+Doe",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-        },
-      ],
-      avatar: "https://ui-avatars.com/api/?name=Project+Team",
-      lastActive: "2 mins ago",
-    },
-    {
-      id: "1",
-      name: "Project Team",
-      creator: "1", // matches currentUser.id
-      members: [
-        {
-          id: "1",
-          name: "John Doe",
-          avatar: "https://ui-avatars.com/api/?name=John+Doe",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-        },
-      ],
-      avatar: "https://ui-avatars.com/api/?name=Project+Team",
-      lastActive: "2 mins ago",
-    },
-    {
-      id: "1",
-      name: "Project Team",
-      creator: "1", // matches currentUser.id
-      members: [
-        {
-          id: "1",
-          name: "John Doe",
-          avatar: "https://ui-avatars.com/api/?name=John+Doe",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-        },
-      ],
-      avatar: "https://ui-avatars.com/api/?name=Project+Team",
-      lastActive: "2 mins ago",
-    },
-    {
-      id: "1",
-      name: "Project Team",
-      creator: "1", // matches currentUser.id
-      members: [
-        {
-          id: "1",
-          name: "John Doe",
-          avatar: "https://ui-avatars.com/api/?name=John+Doe",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-        },
-      ],
-      avatar: "https://ui-avatars.com/api/?name=Project+Team",
-      lastActive: "2 mins ago",
-    },
-    {
-      id: "1",
-      name: "Project Team",
-      creator: "1", // matches currentUser.id
-      members: [
-        {
-          id: "1",
-          name: "John Doe",
-          avatar: "https://ui-avatars.com/api/?name=John+Doe",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-        },
-      ],
-      avatar: "https://ui-avatars.com/api/?name=Project+Team",
-      lastActive: "2 mins ago",
-    },
-    {
-      id: "1",
-      name: "Project Team",
-      creator: "1", // matches currentUser.id
-      members: [
-        {
-          id: "1",
-          name: "John Doe",
-          avatar: "https://ui-avatars.com/api/?name=John+Doe",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          avatar: "https://ui-avatars.com/api/?name=Jane+Smith",
-        },
-      ],
-      avatar: "https://ui-avatars.com/api/?name=Project+Team",
-      lastActive: "2 mins ago",
-    },
-  ];
 
   const selectedGroupDetails = groups.find((g) => g.id === selectedGroup);
   const isGroupAdmin = selectedGroupDetails?.creator === currentUser.id;
@@ -657,16 +520,17 @@ const AddMemberModal = ({ onClose }) => {
   const clickRef = useRef(null);
   const [membersToBeAdded, setMembersToBeAdded] = useState([]);
   const [users, setusers] = useState<User[]>(Sampleusers);
-  const { toast } = useToast()
+  const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
 
-  const addMemberHandler = (id ) => {
+  const addMemberHandler = (id) => {
     if (!membersToBeAdded.includes(id)) {
       setMembersToBeAdded([...membersToBeAdded, id]);
     }
     return;
   };
 
-  const removeMemberHandler = ( id ) => {
+  const removeMemberHandler = (id) => {
     if (membersToBeAdded.includes(id)) {
       const newMembers = membersToBeAdded.filter((member) => member !== id);
       setMembersToBeAdded(newMembers);
@@ -694,7 +558,7 @@ const AddMemberModal = ({ onClose }) => {
     membersToBeAdded.forEach((member) => {
       console.log(member);
     });
-    
+
     onClose(false);
   };
 
@@ -703,6 +567,20 @@ const AddMemberModal = ({ onClose }) => {
       onClose(false);
     }
     return;
+  };
+
+  const searchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    if (e.target.value === "") {
+      setusers(Sampleusers);
+      return;
+    }
+
+    const newUsers = Sampleusers.filter((user) =>
+      user.username.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+
+    setusers(newUsers);
   };
 
   return (
@@ -718,17 +596,32 @@ const AddMemberModal = ({ onClose }) => {
         <div className="flex flex-col gap-4 ">
           <p className="font-bold text-xl">Add Member</p>
 
-          <div className="flex flex-col gap-4 ">
-            {users &&
-              users.map((user) => (
-                <UserItemForGroup
-                  key={user.id}
-                  user={user}
-                  Addhandler={addMemberHandler}
-                  Removehandler={removeMemberHandler}
-                  handlerLoading={isMemberSelected(user.id)}
-                />
-              ))}
+          <div className="flex flex-col gap-6">
+            <Input
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={searchHandler}
+              className="bg-transparent"
+              prefix={<Search className="w-4 h-4 text-gray-500" />}
+            />
+
+            <div className="flex flex-col gap-4 h-52 scrollbar-hide overflow-y-auto ">
+              {users && users.length > 0 ? (
+                users.map((user) => (
+                  <UserItemForGroup
+                    key={user.id}
+                    user={user}
+                    Addhandler={addMemberHandler}
+                    Removehandler={removeMemberHandler}
+                    handlerLoading={isMemberSelected(user.id)}
+                  />
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-400">No Friends found</p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-start gap-4 ">
