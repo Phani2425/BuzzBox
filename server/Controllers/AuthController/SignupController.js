@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 const User = require('../../Models/User');
+const jwt = require('jsonwebtoken');
 
 
 exports.SignupController = async (req, resp) => {
@@ -39,47 +40,32 @@ exports.SignupController = async (req, resp) => {
     }
 }
 
-exports. handleOAuthSignup = async (req, res) => {
-    try {
-      const { email, firstName, lastName, imageUrl } = req.body;
-      
-      // Generate a unique username
-      let userName = `${firstName}${lastName}`.toLowerCase();
-      let isUnique = false;
-      let counter = 0;
-      
-      while (!isUnique) {
-        const userNameToTry = counter === 0 ? userName : `${userName}${counter}`;
-        const existingUser = await User.findOne({ userName: userNameToTry });
-        if (!existingUser) {
-          userName = userNameToTry;
-          isUnique = true;
-        }
-        counter++;
-      }
-  
-      // Check if user already exists
-      let user = await User.findOne({ email });
-      if (user) {
-        // Generate token and return existing user
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-        return res.status(200).json({ token, user });
-      }
-  
-      // Create new user
+
+
+exports.  oauthSignup = async (req, res) => {
+  const { email, userName, profilePic } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+
+    if (!user) {
       user = new User({
         email,
         userName,
-        profilePic: imageUrl,
-        password: crypto.randomBytes(16).toString('hex') // Generate random password for OAuth users
+        profilePic,
       });
-  
       await user.save();
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-      
-      return res.status(201).json({ token, user });
-    } catch (err) {
-      console.error('OAuth signup error:', err);
-      return res.status(500).json({ error: 'Internal server error' });
     }
-  };
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+    res.status(200).json({
+      user,
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

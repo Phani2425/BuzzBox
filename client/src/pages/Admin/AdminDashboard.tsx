@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { 
   Users, 
   MessageSquare, 
-  UserPlus, 
   MessagesSquare,
   TrendingUp 
 } from "lucide-react";
@@ -10,8 +9,6 @@ import { motion } from "framer-motion";
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -19,7 +16,8 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  
 } from "recharts";
 
 const AdminDashboard = () => {

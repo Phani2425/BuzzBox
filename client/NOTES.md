@@ -58,4 +58,67 @@ minute: "2-digit": This formats the minute part of the time as a two-digit numbe
 
 23. learnt two way for implementing a featre where the modal gets closed when i click outside of it. 1st way:- in the inner div attach the ref and add stop Propagtion in click event and add eventlistner in outr div . and in function cehck that if the event target is the outer div then close the modal. 2nd way:- use the useRef hook and attach the ref to the outer div and add event listner to the document and check if the event target is the outer div then close the modal.
 
-24. l3ngth is a property not a funtion!!!!!!!!!!!!!!!
+24. length is a property not a funtion!!!!!!!!!!!!!!!
+
+25. revised about the directives and subdirectives we use in index.css while we use tailwind for applying separate styles in the app.those are:- 
+1.  [@tailwind] base,components,utilities which are used to import styles of base,component and utilites 
+2. @layer :- used to define the custom styles within specific layers: base, components, and utilities. This helps Tailwind CSS to properly merge and order your custom styles with its own styles.
+
+Base: Contains the base styles, such as resets and global styles.
+Components: Contains styles for reusable components.
+Utilities: Contains utility classes that can be used throughout your project.
+
+3. @apply :- used to apply styles to the specific layer
+
+4. like:- 
+```css
+ @layer components {
+  .btn {
+    @apply px-4 py-2 bg-blue-500 text-white rounded;
+  }
+}
+```
+
+26. var():- css function to access css variables
+27. hsl() :-  stands for hue,saturation,lightness :- another way to define a color and often considered as better way than rgb color
+28. remeber when we extend the tailwind.config.js and create our custom themme or color or any thing then we can only use it as taileind className but we can use that other than than if we have declared a varible for that. so generally if we need to use something both as tailwind class and a variable then we extend that in the tailwind config file and also we create a variable in :root in global css file
+
+
+29. lets see an example:-
+```css
+module.exports = {
+  content: [
+    './src/**/*.{js,jsx,ts,tsx}', // Paths to your template files
+  ],
+  theme: {
+    extend: {
+      colors: {
+        customHSL: 'hsl(210, 100%, 50%)', // Custom HSL color
+      },
+    },
+  },
+  plugins: [],
+};
+```
+
+in index.css:-
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --custom-hsl: theme('colors.customHSL');
+}
+
+.custom-class {
+  background-color: var(--custom-hsl);
+}
+```
+
+30. what is :root??? 
+The :root pseudo-class in CSS is used to target the highest-level parent element in the document, which is the <html> element. It is commonly used to define global CSS variables (custom properties) that can be accessed throughout the entire document.
+
+The :root pseudo-class is used to define CSS variables --primary-color, --secondary-color, and --font-size-base.
+These variables are then accessed using the var() function to apply consistent styles to the body and .button elements.

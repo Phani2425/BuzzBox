@@ -7,7 +7,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import combinedReducer from "../src/redux/reducerCombiner";
 import { Toaster } from "./components/ui/toaster.tsx";
-import { ClerkProvider } from '@clerk/clerk-react'
 import { ThemeProvider } from "@/components/ui/theme-provider.tsx";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -15,6 +14,7 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key")
 }
+
 
 
 
@@ -28,7 +28,6 @@ export type RootState = ReturnType<typeof store.getState>;
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
   <BrowserRouter>
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
     <HelmetProvider>
       <Provider store={store}>
         <div onContextMenu={(e) => e.preventDefault()}>
@@ -37,7 +36,6 @@ createRoot(document.getElementById("root")!).render(
         <Toaster/>
       </Provider>
     </HelmetProvider>
-    </ClerkProvider>
   </BrowserRouter>
   </ThemeProvider>
 );

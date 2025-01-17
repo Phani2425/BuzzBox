@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet, useLocation, useNavigate, Link } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, Moon, Sun } from "lucide-react";
 
 import {
   Sheet,
@@ -23,6 +23,15 @@ import { cn } from "@/lib/utils";
 
 import { setAdmin } from "@/redux/slices/authSlice";
 import { useDispatch } from "react-redux";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useTheme } from "@/components/ui/theme-provider";
 
 const iconMap = {
   Gauge,
@@ -57,18 +66,41 @@ const AdminLayout = () => {
 export default AdminLayout;
 
 const AdminNavBar = () => {
+  const { setTheme } = useTheme();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return (
-    <div className=" fixed top-0 left-0 right-0 w-full px-4 h-16 border-b border-b-gray-700 flex items-center ">
+    <div className=" fixed top-0 left-0 right-0 w-full px-4 h-16 border-b border-b-gray-700 flex items-center z-10 bg-white dark:bg-black">
       <div className="flex justify-between items-center w-[95%] mx-auto">
         <h1 className="font-bold text-2xl  bg-gradient-to-r from-green-400 to-green-600 dark:from-[#00A3FF] dark:to-blue-600 bg-clip-text  text-transparent">
           BuzzBox Admin
         </h1>
 
-        <Sheet>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="hidden md:flex  items-center justify-center" variant="outline" size="icon">
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <div className="rounded-full p-2 border  hover:bg-gray-600/20 block md:hidden hover:border-gray-600 cursor-pointer  ">
               <Menu size={20} />
@@ -77,9 +109,31 @@ const AdminNavBar = () => {
           <SheetContent side="left">
             <SheetHeader>
               <SheetTitle className="border-b border-b-gray-600/60">
+                <div className="flex justify-between items-center w-full">
                 <h1 className="font-bold text-2xl  bg-gradient-to-r from-green-400 to-green-600 dark:from-[#00A3FF] dark:to-blue-600 bg-clip-text  text-transparent text-start">
                   BuzzBox Admin
                 </h1>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                      <span className="sr-only">Toggle theme</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setTheme("light")}>
+                      Light
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("dark")}>
+                      Dark
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                      System
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                </div>
               </SheetTitle>
             </SheetHeader>
             <div className="flex flex-col flex-grow pt-5 overflow-y-auto scrollbar-hide h-full">
@@ -90,7 +144,7 @@ const AdminNavBar = () => {
 
                   return (
                     <Link
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={() => setIsSheetOpen(false)}
                       key={item.path}
                       to={item.path}
                       className={cn(
@@ -115,17 +169,18 @@ const AdminNavBar = () => {
               </nav>
               {/* Logout Button at Bottom */}
               <div className="p-4 mt-auto">
-                <Link
+                <div
                   className="flex items-center px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-md transition-all duration-200"
                   onClick={() => {
                     localStorage.removeItem("Admin");
                     dispatch(setAdmin(false));
                     navigate("/");
+                    setIsSheetOpen(false);
                   }}
                 >
                   <LogOut className="w-6 h-6 mr-3" />
                   <span>Logout</span>
-                </Link>
+                </div>
               </div>
             </div>
           </SheetContent>

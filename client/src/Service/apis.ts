@@ -5,4 +5,5 @@ export const authEndpoints = {
     signup:`${BASE_URL}/signup`,
     login:`${BASE_URL}/login`,
     userName:`${BASE_URL}/username`,
+    oauth:`${BASE_URL}/oauth/signup`,
 }

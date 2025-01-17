@@ -1,7 +1,7 @@
 const {uploadProfileInstance,uploadAttachments} = require('../Config/multerConfig');
 const { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin } = require('../Controllers/AdminController/AdminControllers');
 const { LoginController } = require('../Controllers/AuthController/LoginController');
-const { SignupController } = require('../Controllers/AuthController/SignupController');
+const { SignupController, oauthSignup } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
 const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat, getMessages } = require('../Controllers/ChatController/chat');
 const { ProfileController, SearchUser, sendFriendRequest, acceptFriendRequest, getRequests, rejectFriendRequest, getMyFriends, updateProfile } = require('../Controllers/UserController/ProfileController');
@@ -12,6 +12,7 @@ const router = require('express').Router();
 
 //auth routes
 router.post('/signup',uploadProfileInstance.single('image'),SignupController);
+router.post('/oauth/signup',oauthSignup);
 router.post('/login', LoginController);
 router.post('/username', FindUniqueUserName);
 

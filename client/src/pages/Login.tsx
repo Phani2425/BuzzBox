@@ -9,10 +9,11 @@ import { z } from "zod";
 import { authEndpoints } from "@/Service/apis";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
-import { useSignIn } from "@clerk/clerk-react";
 import { useDispatch } from "react-redux";
 import {setUser, setToken} from "@/redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
+import { auth, googleProvider ,githubProvider} from "@/utils/firebase";
+import { signInWithPopup } from "firebase/auth";
 
 interface Form {
   email: string;
@@ -23,7 +24,6 @@ interface Form {
 const Login = () => {
   const { toast } = useToast();
 
-  const { signIn } = useSignIn();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [image, setimage] = useState("");
@@ -145,30 +145,22 @@ const Login = () => {
 
   const signInWithGoogle = async () => {
     try {
-      const result = await signIn?.authenticateWithSocial({
-        strategy: "oauth_google",
-        redirectUrl: "/",
-        redirectUrlComplete: "/",
+      const result = await signInWithPopup(auth, googleProvider);
+      const { user } = result;
+      const { displayName, email, photoURL } = user;
+
+      const response = await connectToApi("POST", authEndpoints.oauth , {
+        email,
+        userName: displayName,
+        profilePic: photoURL,
       });
 
-      if (result.status === "complete") {
-        const { firstName, lastName, emailAddress, imageUrl } = result.userData;
-
-        // Send data to your backend
-        const response = await connectToApi("POST", "/api/v1/oauth/signup", {
-          email: emailAddress,
-          firstName,
-          lastName,
-          imageUrl,
-        });
-
-        if (response) {
-          dispatch(setUser(response.data.user));
-          dispatch(setToken(response.data.token));
-          localStorage.setItem("User", JSON.stringify(response.data.user));
-          localStorage.setItem("token", response.data.token);
-          navigate('/');
-        }
+      if (response) {
+        dispatch(setUser(response.data.user));
+        dispatch(setToken(response.data.token));
+        localStorage.setItem("User", JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
+        navigate('/');
       }
     } catch (err) {
       console.error("Error signing in with Google", err);
@@ -182,15 +174,33 @@ const Login = () => {
 
   const signInWithGithub = async () => {
     try {
-      await signIn.authenticateWithRedirect({
-        strategy: "oauth_github",
-        redirectUrl: "/",
-        redirectUrlComplete: "/",
+      const result = await signInWithPopup(auth, githubProvider);
+      const { user } = result;
+      const { displayName, email, photoURL } = user;
+
+      const response = await connectToApi("POST", authEndpoints.oauth, {
+        email,
+        userName: displayName,
+        profilePic: photoURL,
       });
+
+      if (response) {
+        dispatch(setUser(response.data.user));
+        dispatch(setToken(response.data.token));
+        localStorage.setItem("User", JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
+        navigate('/');
+      }
     } catch (err) {
       console.error("Error signing in with GitHub", err);
+      toast({
+        title: "Error",
+        description: "Failed to sign in with GitHub",
+        variant: "destructive",
+      });
     }
   };
+
 
   return (
     <div className="h-screen w-screen bg-[url('./bg.png')] flex justify-center items-center">
@@ -217,7 +227,7 @@ const Login = () => {
                 className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4"
                 onClick={signInWithGithub}
               >
-                <img src="./facebook.png" className="w-4" />
+                <img src="./github-logo.png" className="w-5" />
                 GitHub
               </Button>
             </div>
