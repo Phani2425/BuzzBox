@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import ChatList from "../Specific/ChatList";
-import { SampleChats } from "@/constants/sampleData";
 import { useParams } from "react-router-dom";
 import Profile from "../Specific/Profile";
+import { useMyChatsQuery } from "@/redux/rtkQueryAPIs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 type WrappedComponentProps = {
   [key: string]: any; // Use appropriate type for your props
@@ -16,8 +18,22 @@ const AppLayout =
     return (props: WrappedComponentProps) => {
       const params = useParams();
       const chatId = params.id;
+      const {toast} = useToast();
+
+      const { data, error, isLoading, isError, refetch } = useMyChatsQuery();
 
       const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+      useEffect(() => {
+        if (isError) {
+          console.log("Error fetching the chats", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: `Error fetching the chats:- ${error}`,
+          });
+        }
+      }, [error, isError]);
 
       const handledeleteChat = (
         e: React.MouseEvent<HTMLDivElement>,
@@ -56,34 +72,79 @@ const AppLayout =
             <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] gap-6 h-[calc(100%-2rem)] mt-8 ">
               {/* Left section */}
               <div
-                className={`hidden md:block glassmorphism rounded-2xl ${
+                className={`hidden md:block glassmorphism rounded-2xl overflow-y-auto scrollbar-hide ${
                   isMobileMenuOpen ? "block" : "hidden"
                 } md:block`}
               >
-                <ChatList
-                  chats={SampleChats}
-                  chatId={chatId}
-                  newMessagesAlert={[
-                    {
-                      chatId: "1",
-                      count: 5,
-                    },
-                    {
-                      chatId: "2",
-                      count: 3,
-                    },
-                  ]}
-                  onlineUsers={["3", "4"]}
-                  handleDeleteChat={handledeleteChat}
-                />
+                {isError && <div>{`Error fethcing the chats:- ${error}`}</div>}
+                {isLoading ? (
+                  <div className="flex flex-col gap-2 w-full px-1">
+                    {new Array(15).fill(0).map((_, i) => {
+                      return (
+                        <Skeleton key={i} className="w-full h-16 rounded-xl" />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <ChatList
+                    chats={data.chats}
+                    chatId={chatId}
+                    newMessagesAlert={[
+                      {
+                        chatId: "1",
+                        count: 5,
+                      },
+                      {
+                        chatId: "2",
+                        count: 3,
+                      },
+                    ]}
+                    onlineUsers={["3", "4"]}
+                    handleDeleteChat={handledeleteChat}
+                  />
+                )}
               </div>
 
               <div
-                className={`fixed inset-y-0 left-0 transform ${
+                className={`fixed bottom-0 top-20 left-0 transform ${
                   isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
                 } md:hidden transition duration-200 ease-in-out z-40 w-64 bg-white/80 dark:bg-black/80 backdrop-blur-xl backdrop-saturate-150 overflow-y-auto`}
               >
-                <div className="p-6">Mobile Menu Content</div>
+                <div className="py-6">
+                  {isError && (
+                    <div>{`Error fethcing the chats:- ${error}`}</div>
+                  )}
+                  {isLoading ? (
+                    <div className="flex flex-col gap-2 w-full px-1">
+                      {new Array(15).fill(0).map((_, i) => {
+                        return (
+                          <Skeleton
+                            key={i}
+                            className="w-full h-16 rounded-xl"
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <ChatList
+                      chats={data.chats}
+                      chatId={chatId}
+                      newMessagesAlert={[
+                        {
+                          chatId: "1",
+                          count: 5,
+                        },
+                        {
+                          chatId: "2",
+                          count: 3,
+                        },
+                      ]}
+                      onlineUsers={["3", "4"]}
+                      handleDeleteChat={handledeleteChat}
+                      setIsMobileMenuOpen
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="col-span-2 md:col-span-1 glassmorphism rounded-2xl ">

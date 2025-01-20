@@ -8,19 +8,15 @@ import { Provider } from "react-redux";
 import combinedReducer from "../src/redux/reducerCombiner";
 import { Toaster } from "./components/ui/toaster.tsx";
 import { ThemeProvider } from "@/components/ui/theme-provider.tsx";
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key")
-}
-
-
+import { api } from "./redux/rtkQueryAPIs.ts";
 
 
 //configuring the redux store
 const store = configureStore({
   reducer: combinedReducer,
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware().concat(api.middleware)
+  }
 });
 // Infer the `RootState` type from the store itself
 export type RootState = ReturnType<typeof store.getState>;

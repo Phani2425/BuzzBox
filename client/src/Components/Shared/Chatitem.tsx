@@ -1,51 +1,65 @@
-import React, { memo } from 'react'
-import { Link } from 'react-router-dom'
-import { ChatitemProps } from '@/Types/types'
-import AvatarCard from './AvatarCard'
+import React, { memo } from "react";
+import { Link,useNavigate } from "react-router-dom";
+import { ChatitemProps } from "@/Types/types";
+import AvatarCard from "./AvatarCard";
+import {cn} from "@/lib/utils";
 
-
-const Chatitem : React.FC<ChatitemProps> = ({
-    avatar=[],
-    name,
-    _id,
-    lastMessage,
-    groupChat=false,
-    sameSender,
-    isOnline,
-    newMessageAlert,
-    index=0,
-    handleDeleteChat
+const Chatitem: React.FC<ChatitemProps> = ({
+  avatar = [],
+  name,
+  _id,
+  lastMessage,
+  groupChat = false,
+  sameSender,
+  isOnline,
+  newMessageAlert,
+  index = 0,
+  handleDeleteChat,
+  setIsMobileMenuOpen
 }) => {
+  const navigate = useNavigate();
 
-
+  const clickHandler = () => {
+    if (setIsMobileMenuOpen) {
+      setIsMobileMenuOpen();
+    }
+    navigate(`/chat/${_id}`);
+  };
   return (
-    <Link to={`/chat/${_id}`} onContextMenu={(e) => handleDeleteChat(e, _id, groupChat)} className='flex flex-col gap-[1rem] '  >
-
-      <div className={`flex p-[1rem] gap-[1rem] alignItems-center  ${sameSender ? "bg-black text-white hover:bg-black/80": "bg-white text-black hover:bg-white/80"} relative `}>
-
+    <Link
+      to={`/chat/${_id}`}
+      onContextMenu={(e) => handleDeleteChat(e, _id, groupChat)}
+      className="w-full"
+      onClick={clickHandler}
+    >
+      <div
+       
+        className={cn(
+          "flex items-center gap-3 p-3  transition-colors duration-200",
+          "hover:bg-gray-100 dark:hover:bg-gray-800/50",
+          sameSender
+            ? "bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            : "bg-transparent dark:bg-transparent text-gray-700 dark:text-gray-300",
+          "relative"
+        )}
+      >
         <AvatarCard avatar={avatar} />
 
-        <div>
-          <p>{name}</p>
-          {
-            newMessageAlert && (
-              <p>{newMessageAlert.count} New Messages</p>
-            )
-          }
+        <div className="flex flex-col">
+          <p className="font-medium">{name}</p>
+          {newMessageAlert && (
+            <span className="text-sm text-green-600 dark:text-green-400">
+              {newMessageAlert.count} New Messages
+            </span>
+          )}
         </div>
 
-        {
-          isOnline && (
-            <div className='w-3 h-3 rounded-full bg-green-500 absolute top-[50%] right-4 -translate-y-1/2'></div>
-          )
-        }
-
-        
-
+        {isOnline && (
+          <div className="absolute right-3 w-2 h-2 bg-green-500 rounded-full" />
+        )}
       </div>
-
     </Link>
-  )
-}
+  );
+};
 
 export default memo(Chatitem);

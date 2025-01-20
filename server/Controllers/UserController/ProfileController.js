@@ -90,7 +90,7 @@ exports.SearchUser = async (req, resp) => {
    try {
 
       //fetching the username from query of url
-      const { userName } = req.body;
+      const  userName  = req.query.name;
       //ye username either empty hoga ya phir kuch likha hoga
       //agar empty hoga toh i will return all the users which are not my friend
       //agar kuch likha hoga toh i will return all the users which are not my friend and whose username matches the query

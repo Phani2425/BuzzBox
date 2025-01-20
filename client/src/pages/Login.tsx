@@ -10,10 +10,11 @@ import { authEndpoints } from "@/Service/apis";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import { useDispatch } from "react-redux";
-import {setUser, setToken} from "@/redux/slices/authSlice";
+import {setUser, setToken, setUserName} from "@/redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { auth, googleProvider ,githubProvider} from "@/utils/firebase";
 import { signInWithPopup } from "firebase/auth";
+
 
 interface Form {
   email: string;
@@ -158,6 +159,7 @@ const Login = () => {
       if (response) {
         dispatch(setUser(response.data.user));
         dispatch(setToken(response.data.token));
+        dispatch(setUserName(false));
         localStorage.setItem("User", JSON.stringify(response.data.user));
         localStorage.setItem("token", response.data.token);
         navigate('/');
@@ -187,6 +189,7 @@ const Login = () => {
       if (response) {
         dispatch(setUser(response.data.user));
         dispatch(setToken(response.data.token));
+        dispatch(setUserName(false));
         localStorage.setItem("User", JSON.stringify(response.data.user));
         localStorage.setItem("token", response.data.token);
         navigate('/');
@@ -211,20 +214,20 @@ const Login = () => {
           className="bg-slate-900 border-2  border-slate-600 w-[85%] sm:w-[50%] md:w-[30%] h-fit rounded-xl shadow-lg flex p-5 flex-col gap-3
      items-center"
         >
-          <div className="flex gap-5 flex-col">
+          <div className="flex gap-5 flex-col w-full">
             <h1 className="font-bold text-3xl text-white text-center">
-              Create an Account
+              Create Account
             </h1>
             <div className="flex gap-2 items-center">
               <Button
-                className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4"
+                className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4 hover:bg-slate-700"
                 onClick={signInWithGoogle}
               >
                 <img src="./google.png" className="w-4" />
                 Google
               </Button>
               <Button
-                className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4"
+                className="text-white flex gap-2 bg-slate-800 w-[70%] py-1 px-4 hover:bg-slate-700 "
                 onClick={signInWithGithub}
               >
                 <img src="./github-logo.png" className="w-5" />
@@ -332,7 +335,7 @@ const Login = () => {
             </div>
 
             <Button
-              className="w-full bg-blue-700 hover:bg-blue-800"
+              className="w-full bg-blue-700 hover:bg-blue-800 text-white "
               onClick={submitHandler}
             >
               {loading ? (

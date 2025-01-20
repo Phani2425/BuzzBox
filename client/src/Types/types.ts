@@ -12,7 +12,9 @@ export interface ChatitemProps {
     },
     index?: number,
     handleDeleteChat?: any,
-    members?: string[]
+    members?: string[];
+    setIsMobileMenuOpen?: () => void;
+
 }
 
 export interface chatList {
@@ -25,12 +27,13 @@ export interface chatList {
         count:number
     }[];
     handleDeleteChat?: any;
+    setIsMobileMenuOpen?: () => void;
 }
 
 export interface User {
-    id: string;
-    username: string;
-    avatar: string;
+    _id: string;
+    userName: string;
+    profilePic: string;
    
 }
 

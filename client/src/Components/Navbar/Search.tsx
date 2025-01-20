@@ -9,9 +9,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import UserItem from "../Shared/UserItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User } from "@/Types/types";
-import { Sampleusers } from "@/constants/sampleData";
+import { useLazySearchUsersQuery } from "@/redux/rtkQueryAPIs";
 
 const Search = ({
   isOpen,
@@ -22,12 +22,45 @@ const Search = ({
 }) => {
   const [isFriendRequestSent, setIsFriendRequestSent] =
     useState<boolean>(false);
-  const [users, setusers] = useState<User[]>(Sampleusers);
+  const [userName, setuserName] = useState<string>("");
+  const [users, setusers] = useState<User[]>([]);
+
+  const [searchUsers] = useLazySearchUsersQuery();
 
   const sendFriendRequest = (id: string) => {
     console.log(id);
     setIsFriendRequestSent(true);
   };
+
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setuserName(e.target.value.trim());
+  };
+
+  useEffect(() => {
+    searchUsers('').then(({data}) => {
+      const trimmedData = data.users.slice(0,7);
+      setusers(trimmedData);
+    })
+  },[])
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (userName.length > 3) {
+        searchUsers(userName).then(({ data }) => {
+          console.log(data);
+          if (data) {
+            setusers(data.users);
+          }
+        });
+      } else {
+        return;
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [userName]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -43,14 +76,20 @@ const Search = ({
           <Label htmlFor="username" className="text-right font-semibold ">
             Username
           </Label>
-          <Input id="username" placeholder="rombor" className="col-span-3" />
+          <Input
+            id="username"
+            placeholder="rombor"
+            className="col-span-3"
+            onChange={changeHandler}
+            value={userName}
+          />
         </div>
 
         <div className="flex flex-col gap-4 items-start">
           {users &&
             users.map((user) => (
               <UserItem
-                key={user.id}
+                key={user._id}
                 user={user}
                 handler={sendFriendRequest}
                 handlerLoading={isFriendRequestSent}

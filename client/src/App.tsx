@@ -10,6 +10,7 @@ import Users from "../src/Components/Admin/Users";
 import Groups from "../src/Components/Admin/Groups";
 import Messages from "../src/Components/Admin/Messages";
 import Settings from "../src/Components/Admin/Settings";
+import SetUserNameModal from "../src/Components/Specific/SetUSerNameModal";
 
 const Home = lazy(() => import("./pages/Home"));
 const Chat = lazy(() => import("./pages/Chat"));
@@ -29,6 +30,7 @@ function App() {
             </RouteProtector>
           }
         />
+        <Route path="/username" element={<SetUserNameModal />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/chat/:id"

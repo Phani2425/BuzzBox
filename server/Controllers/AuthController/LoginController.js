@@ -25,8 +25,8 @@ exports. LoginController = async (req, resp) => {
         const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:'7d'});
 
         resp.cookie('token',token,{
-            httpOnly:true,
-            maxAge:7*24*60*60*1000
+            httpOnly:false,
+            maxAge:7*24*60*60*1000,
         })
 
         return resp.status(200).json({

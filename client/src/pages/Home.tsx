@@ -3,6 +3,8 @@ import { MessageSquare, UserPlus, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Home = () => {
+
+
   const features = [
     {
       icon: MessageSquare,
@@ -44,6 +46,7 @@ const Home = () => {
     },
   };
 
+
   return (
     <div className="flex flex-col items-center justify-center h-full p-8">
       <p className="font-semibold text-xl mb-12 text-center bg-gradient-to-r from-green-400 to-blue-500 dark:from-[#00A3FF] dark:to-blue-600 bg-clip-text text-transparent animate-pulse">
@@ -78,6 +81,8 @@ const Home = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      
     </div>
   );
 };

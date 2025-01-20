@@ -120,7 +120,7 @@ const LoginForm: React.FC<loginProp> = ({ setLogin }) => {
         </div>
 
         <Button
-          className="w-full bg-blue-700 hover:bg-blue-800"
+          className="w-full bg-blue-700 hover:bg-blue-800 text-white"
           onClick={submitHandler}
         >
           {loading ? <div className="custom-loader"></div> : "Login"}

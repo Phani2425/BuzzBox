@@ -98,7 +98,7 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
         </div>
 
         <button
-          className="md:hidden p-2 bg-white/10 rounded-full text-white"
+          className="md:hidden p-2 bg-gray-300 dark:bg-white/10 rounded-full text-white"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

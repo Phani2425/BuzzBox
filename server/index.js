@@ -19,14 +19,16 @@ const io = new Server(server, {});
 
 exports.userSocketMap = new Map();
 
-
-app.use(express.json());
-app.use(cookieParser());
 app.use(cors({
-    origin: '*',
+    origin: ["http://localhost:5173"],
     credentials: true
     //important for cookies as we will be passing cookies in request headers
 }))
+
+
+app.use(express.json());
+app.use(cookieParser());
+
 
 //routes section
 app.use('/api/v1', router);

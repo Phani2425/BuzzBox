@@ -1,7 +1,7 @@
 const {uploadProfileInstance,uploadAttachments} = require('../Config/multerConfig');
 const { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin } = require('../Controllers/AdminController/AdminControllers');
 const { LoginController } = require('../Controllers/AuthController/LoginController');
-const { SignupController, oauthSignup } = require('../Controllers/AuthController/SignupController');
+const { SignupController, oauthSignup, setUserName } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
 const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat, getMessages } = require('../Controllers/ChatController/chat');
 const { ProfileController, SearchUser, sendFriendRequest, acceptFriendRequest, getRequests, rejectFriendRequest, getMyFriends, updateProfile } = require('../Controllers/UserController/ProfileController');
@@ -17,7 +17,9 @@ router.post('/login', LoginController);
 router.post('/username', FindUniqueUserName);
 
 
+
 //user Routes
+router.post('/setusername',setUserName);
 router.get('/profile',isAuthenticated,ProfileController);
 router.put('/profile/updateprofile',isAuthenticated,uploadProfileInstance.single('image'),updateProfile); 
 //here in searchuser we are expecting a url like /user/search?name=phani  so while writing routes for it we only write the path part not the query part

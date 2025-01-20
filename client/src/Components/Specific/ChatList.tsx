@@ -14,6 +14,7 @@ const ChatList: React.FC<chatList> = ({
     },
   ],
   handleDeleteChat,
+  setIsMobileMenuOpen
 }) => {
   return (
     <div className={`w-[${w}] flex flex-col`}>
@@ -41,6 +42,7 @@ const ChatList: React.FC<chatList> = ({
             sameSender={chatId === _id}
             handleDeleteChat={handleDeleteChat}
             index={index}
+            setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
         );
       })}
