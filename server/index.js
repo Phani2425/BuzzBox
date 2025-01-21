@@ -1,41 +1,42 @@
-const express = require('express');
-const { connectToDatabase } = require('./Config/database');
-require('dotenv').config();
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const router = require('./Routes/route');
+const express = require("express");
+const { connectToDatabase } = require("./Config/database");
+require("dotenv").config();
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const router = require("./Routes/route");
 // const { messageSeeder, singleChatSeeder, groupChatSeeder } = require('./seeders/chatseed');
 // const { createFakeUser } = require('./seeders/userseed');
-const { createServer } = require('http');
-const { Server } = require('socket.io');
-const { NEW_MESSAGE_ALERT, NEW_MESSAGE } = require('./Constants/events');
-const { v4: uuidv4 } = require('uuid');
-const { getSockets } = require('./Utils/utilityFunctions');
-const Message = require('./Models/Message');
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const { NEW_MESSAGE_ALERT, NEW_MESSAGE } = require("./Constants/events");
+const { v4: uuidv4 } = require("uuid");
+const { getSockets } = require("./Utils/utilityFunctions");
+const Message = require("./Models/Message");
+const { corsOption } = require("./Constants/config");
+const jwt = require("jsonwebtoken");
+const User = require("./Models/User");
+const { addUserSocket,
+    removeUserSocket,
+     } = require('./socketManager');
+const { default: mongoose } = require("mongoose");
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, { cors: corsOption });
 
-exports.userSocketMap = new Map();
 
-app.use(cors({
-    origin: ["http://localhost:5173"],
-    credentials: true
-    //important for cookies as we will be passing cookies in request headers
-}))
 
+app.use(cors(corsOption));
 
 app.use(express.json());
 app.use(cookieParser());
 
-
 //routes section
-app.use('/api/v1', router);
+app.use("/api/v1", router);
 
-app.get('/', (_, resp) => {
-    resp.send('app is up and running')
-})
+app.get("/", (_, resp) => {
+  resp.send("app is up and running");
+});
 
 connectToDatabase();
 
@@ -51,87 +52,80 @@ connectToDatabase();
 
 //another way is to use middleware provided by the socket.io
 
-io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
-    if (token) {
-        //check the token and get the user data
-        //if the token is valid then we will call next() to allow the user to connect to the socket
-        next();
-    } else {
-        next(new Error('unauthorized'));
+io.use(async (socket, next) => {
+  const token = socket.handshake.query.token;
+  if (!token) {
+    next(new Error("Authentication error"));
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    next(new Error("user Not found"));
+  }
+  socket.user = user;
+  next();
+});
+
+io.on("connection", (socket) => {
+  //assuming we have user info
+  const user = socket.user;
+
+  //mapping the user id with its socket id
+  addUserSocket(user._id.toString(), socket.id);
+  //there will be a function named as getSocketID() which will take user id and return the current corresponding socket id
+
+  console.log("a user connected with socket id", socket.id);
+
+//   console.log("userSocketMap", userSocketMap);
+
+  socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
+    const messageForRealtime = {
+      _id: uuidv4(),
+      chat: chatId,
+      content: message,
+      sender: {
+        _id: user._id,
+        name: user.name,
+      },
+      createdAt: new Date().toISOString(),
+    };
+
+    console.log("message received", messageForRealtime);
+
+    const membersSocketId = getSockets(members);
+    io.to(membersSocketId).emit(NEW_MESSAGE, {
+      chatId,
+      message: messageForRealtime,
+    });
+
+    io.to(socket.id).emit(NEW_MESSAGE_ALERT, {
+      chatId,
+    });
+
+    socket.on("disconnect", () => {
+      removeUserSocket(user._id.toString());
+      console.log("user disconnected with socket id", socket.id);
+    });
+
+    try {
+      const messageForDb = new Message({
+        chat: new mongoose.Types.ObjectId(chatId),
+        content: message,
+        sender: user._id,
+      });
+
+      //save the message in bd
+      await messageForDb.save();
+    } catch (err) {
+      console.log("error occured while saving the message in db", err.message);
     }
-})  
-
-
-io.on('connection', (socket) => {
-    //assuming we have user info
-    const user = {
-        _id: 'jhvccv',
-        name: 'phani',
-    }
-    //mapping the user id with its socket id
-    userSocketMap.set(user._id.toString(), socket.id);
-    //there will be a function named as getSocketID() which will take user id and return the current corresponding socket id
-
-    console.log('a user connected with socket id', socket.id);
-
-    console.log('userSocketMap', userSocketMap);
-
-    socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
-
-        const messageForRealtime = {
-            _id: uuidv4(),
-            chat: chatId,
-            content: message,
-            sender: {
-                _id: user._id,
-                name: user.name
-            },
-            createdAt: new Date().toISOString()
-        }
-
-
-        const membersSocketId = getSockets(members);
-        io.to(membersSocketId).emit(NEW_MESSAGE, {
-            chatId,
-            message: messageForRealtime
-        });
-
-        io.to(socket.id).emit(NEW_MESSAGE_ALERT, {
-            chatId
-
-        });
-
-        socket.on('disconnect', () => {
-            userSocketMap.delete(user._id.toString());
-            console.log('user disconnected with socket id', socket.id);
-        })
-
-       try{
-
-        const messageForDb = new Message(
-            {
-                chat: chatId,
-                content: message,
-                sender: user._id
-            }
-        )
-
-        //save the message in bd
-        await messageForDb.save();
-
-       }catch(err){
-
-        console.log('error occured while saving the message in db',err.message);
-
-       }
-
-    })
-})
-
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-    console.log(`server is listening at port ${PORT}`)
-})
+  console.log(`server is listening at port ${PORT}`);
+});

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../Models/User');
 
 exports.isAuthenticated = (req, res, next) => {
     try {
@@ -35,3 +36,30 @@ exports.isAuthenticated = (req, res, next) => {
         });
     }
 };
+
+exports. socketAuthenticator = async (err,socket,next) => {
+  try{
+
+    if(err) return next(err);
+
+    const authToken = socket.request.cookies.token;
+
+    if(!authToken) return next(new Error('Token Unavailable'));
+
+    const decodedData = jwt.verify(authToken, process.env.JWT_SECRET);
+
+    const user = await User.findById(decodedData._id);
+
+    if(!user) return next(new Error('User not found'));
+
+    socket.user = user;
+
+    return next();
+
+  }catch(error){
+
+    console.log(error);
+    return next(new Error('Authentication error'));
+
+  }
+}

@@ -8,6 +8,7 @@ import Profile from "../Specific/Profile";
 import { useMyChatsQuery } from "@/redux/rtkQueryAPIs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { getSocket } from "@/Socket";
 
 type WrappedComponentProps = {
   [key: string]: any; // Use appropriate type for your props
@@ -16,6 +17,10 @@ type WrappedComponentProps = {
 const AppLayout =
   () => (WrappedComponent: React.ComponentType<WrappedComponentProps>) => {
     return (props: WrappedComponentProps) => {
+
+      const socket = getSocket();
+      console.log(socket.id);
+       
       const params = useParams();
       const chatId = params.id;
       const {toast} = useToast();

@@ -188,7 +188,30 @@ export const api = createApi({
         }
       }),
       invalidatesTags:['Chat','Group']
-    })
+    }),
+
+
+    chatDetails:builder.query({
+      query:(id,populate=false) => ({
+        url: `chat/${id}?populate=${populate}`,
+        headers: {
+          "content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      
+      })
+    }),
+
+    getMessages:builder.query({
+      query:(id,page=1) => ({
+        url: `messages/${id}?page=${page}`,
+        headers: {
+          "content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      
+      })
+    }),
   })
 });
 
@@ -207,5 +230,7 @@ export const {
   useRemoveMembersMutation,
   useLeaveGroupMutation,
   useDeleteGroupMutation,
-  useRenameGroupMutation
+  useRenameGroupMutation,
+  useLazyChatDetailsQuery,
+  useLazyGetMessagesQuery
 } = api;

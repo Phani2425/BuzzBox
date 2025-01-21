@@ -131,4 +131,83 @@ also i forgot the type of state change function which is: - Dispatch<setStateAct
 
 33. hooks acn never bbe conditionaly clled it will always be clled on the top part of a component and inside the component
 
-34,. of we want to find if a string is present inside another string then we basically use the include() method on the larger string and pass the smaller string inside it
+34. of we want to find if a string is present inside another string then we basically use the include() method on the larger string and pass the smaller string inside it
+
+
+35. Here’s a simplified explanation covering everything:
+
+---
+
+### **1. `useParams`**
+- Used to get **dynamic values** from the URL.
+- Example:
+  If the route is `/user/:id`, and the URL is `/user/42`, then:
+  ```javascript
+  const { id } = useParams();
+  console.log(id); // "42"
+  ```
+  Use it to fetch specific data based on the dynamic part of the URL.
+
+---
+
+### **2. `useLocation`**
+- Used to access the **current URL details**, like the path, query parameters, or state.
+- Example:
+  ```javascript
+  const location = useLocation();
+  console.log(location.pathname); // Current path, e.g., "/profile"
+  console.log(location.search); // Query string, e.g., "?userId=123"
+  console.log(location.state); // State passed from another page, e.g., { userId: 123 }
+  ```
+  Use it when you need to know details about the current URL.
+
+---
+
+### **3. Maintaining State Between Pages**
+State can be passed between pages without showing it in the URL using `useLocation`.
+
+- **How to pass state:**
+  ```javascript
+  const navigate = useNavigate();
+  navigate("/profile", { state: { userId: 123, username: "JohnDoe" } });
+  ```
+
+- **How to access state:**
+  ```javascript
+  const location = useLocation();
+  console.log(location.state); // { userId: 123, username: "JohnDoe" }
+  ```
+
+Use this method for passing sensitive or temporary data between pages.
+
+---
+
+### **4. What is `new URLSearchParams`?**
+`URLSearchParams` is a JavaScript utility to work with **query strings** in a URL.
+
+- **What it does:**
+  It helps you:
+  - Get values from query strings.
+  - Add or update query parameters.
+  - Convert an object to a query string.
+
+- **Example:**
+  For the URL `/profile?userId=123&username=JohnDoe`:
+  ```javascript
+  const params = new URLSearchParams(location.search);
+
+  console.log(params.get("userId")); // "123"
+  console.log(params.get("username")); // "JohnDoe"
+  ```
+
+- **Use Case:**
+  Use it to filter, sort, or search data in an app by reading the query parameters.
+
+---
+
+### **When to Use Each**
+- **`useParams`**: For reading dynamic parts of the URL.
+- **`useLocation`**: For accessing URL details or state passed between pages.
+- **`URLSearchParams`**: For working with query strings like `?key=value`.
+
+This covers everything you asked in a simpler way!

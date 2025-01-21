@@ -11,6 +11,7 @@ import Groups from "../src/Components/Admin/Groups";
 import Messages from "../src/Components/Admin/Messages";
 import Settings from "../src/Components/Admin/Settings";
 import SetUserNameModal from "../src/Components/Specific/SetUSerNameModal";
+import { SocketProvider } from "../src/Socket";
 
 const Home = lazy(() => import("./pages/Home"));
 const Chat = lazy(() => import("./pages/Chat"));
@@ -21,12 +22,15 @@ const AdminLayout = lazy(() => import("./Components/Layout/AdminLayout"));
 function App() {
   return (
     <Suspense fallback={<Loaders />}>
+      <SocketProvider>
       <Routes>
         <Route
           path="/"
           element={
             <RouteProtector redirect="/login" role="user">
-              <Home />
+              
+                <Home />
+              
             </RouteProtector>
           }
         />
@@ -67,6 +71,7 @@ function App() {
           <Route path="/admin/dashboard/settings" element={<Settings />} />
         </Route>
       </Routes>
+      </SocketProvider>
     </Suspense>
   );
 }
