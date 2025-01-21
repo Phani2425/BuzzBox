@@ -166,6 +166,41 @@ exports.getMyGroupChats = async (req, resp) => {
     }
 }
 
+exports. getAllGroupChats = async(req,resp) => {
+    try{
+
+        const userId = req.user.id;
+
+        const allgroups = await Chat.find({members:userId,groupChat:true}).populate('members','userName profilePic');
+
+        const transfomedChat = allgroups.map(({_id,name,members,creator}) => {
+            
+            return {
+                _id,
+                name,
+                members,
+                grpAvatar:members.slice(0,3).map((member) => member.profilePic),
+                creator
+            }
+        })
+
+        return resp.status(200).json({
+            success:true,
+            allgroups:transfomedChat,
+            message:'all group chats fetched'
+        })
+
+    }catch(err){
+        console.error(err);
+        console.log('error occured while fetching all group chats', err.message);
+        resp.status(500).json({
+            success: false,
+            message: 'internal server error',
+            error: err.message
+        })
+    }
+}
+
 //controller for  adding members to a group
 
 exports.addMembers = async (req, resp) => {

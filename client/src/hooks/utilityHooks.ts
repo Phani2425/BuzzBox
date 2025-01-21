@@ -1,0 +1,1 @@
+//in mutation hook while calling that we need to manage the states like loading errors and other things and we will be using mutation hooks many time s thats why to not use same codes multiple time we wil do one thinkfg that we will create a hook which will recieve the muattion hook and return  

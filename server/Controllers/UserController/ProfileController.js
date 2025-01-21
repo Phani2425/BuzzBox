@@ -101,7 +101,7 @@ exports.SearchUser = async (req, resp) => {
 
       const friends = singleChatMembers.map(chat => chat.members.find(member => member._id.toString() !== req.user.id));
 
-      // console.log(friends);
+      friends.push( new mongoose.Types.ObjectId(req.user.id));
 
       //fetch all the users which are not my friend
       const users = await User.find({ _id: { $nin: friends } }, { userName: 1, profilePic: 1 }).lean();
@@ -142,10 +142,10 @@ exports.getRequests = async (req, resp) => {
       const userId = req.user.id;
 
       // Fetch friend requests where the user is the receiver
-      const receivedRequests = await Request.find({ receiver: userId }).populate('sender', 'userName profilePic');
+      const receivedRequests = await Request.find({ receiver: userId,status:'pending' }).populate('sender', 'userName profilePic');
 
       // Fetch friend requests where the user is the sender
-      const sentRequests = await Request.find({ sender: userId }).populate('receiver', 'userName profilePic');
+      const sentRequests = await Request.find({ sender: userId,status:'pending'  }).populate('receiver', 'userName profilePic');
 
       // Send the requests to the frontend
       return resp.status(200).json({
@@ -304,6 +304,7 @@ exports.rejectFriendRequest = async (req, resp) => {
       });
    }
 }
+
 
 // when an error occurs in an HTTP request, the response object is typically wrapped inside an error object. This is common when using libraries like Axios for making HTTP requests.
 

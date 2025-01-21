@@ -13,20 +13,20 @@ const UserItemForGroup: React.FC<Prop> = ({
     Removehandler,
     handlerLoading,
   }) => {
-    const { username, id, avatar } = user;
+    const { userName, _id, profilePic } = user;
   
     return (
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3">
-          <img src={avatar} alt={username} className="w-10 h-10 rounded-full" />
-          <p>{user.username}</p>
+          <img src={profilePic} alt={userName} className="w-10 h-10 rounded-full" />
+          <p>{user.userName}</p>
         </div>
         {handlerLoading ? (
-          <button onClick={() => Removehandler(id)}>
+          <button onClick={() => Removehandler(_id)}>
             <MinusCircle size={27} />
           </button>
         ) : (
-          <button onClick={() => Addhandler(id)}>
+          <button onClick={() => Addhandler(_id)}>
             <PlusCircle size={27} />
           </button>
         )}

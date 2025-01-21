@@ -122,3 +122,13 @@ The :root pseudo-class in CSS is used to target the highest-level parent element
 
 The :root pseudo-class is used to define CSS variables --primary-color, --secondary-color, and --font-size-base.
 These variables are then accessed using the var() function to apply consistent styles to the body and .button elements.
+
+31. i was forgotten the  type of state when we use useSeleector: - which is : RootState and we have to create it in the same file  where the store get created.how to create it:- ReturnType<typeof store.getState>
+
+also i forgot the type of state change function which is: - Dispatch<setStateAction<the datatype handles by the function>>   :- here the Dispatch and setStateAction is imported from the react
+
+32. also while using rtk query when i was logging out and logging in to another acc still that cached data was not getting cleared because everytime we have to manually handle that as rtk query do not provide the  cache clearing mechanism by default. so how can i do that:- [dispatch(api.util.resetApiState())]
+
+33. hooks acn never bbe conditionaly clled it will always be clled on the top part of a component and inside the component
+
+34,. of we want to find if a string is present inside another string then we basically use the include() method on the larger string and pass the smaller string inside it

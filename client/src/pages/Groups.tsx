@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
-  Search,
   UserPlus,
   MoreVertical,
   Users,
@@ -19,52 +18,114 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { User } from "@/Types/types";
-import { Sampleusers } from "@/constants/sampleData";
 import UserItemForGroup from "@/Components/Shared/UserItemForGroup";
 import { useToast } from "@/hooks/use-toast";
-import { groups } from "../constants/sampleData";
+import { useSelector } from "react-redux";
+import { RootState } from "@/main";
+import {
+  useAddMembersMutation,
+  useDeleteGroupMutation,
+  useGetAllGroupQuery,
+  useLazyGetMyFriendsQuery,
+  useLeaveGroupMutation,
+  useRemoveMembersMutation,
+  useRenameGroupMutation,
+} from "@/redux/rtkQueryAPIs";
+import GroupAvatar from "@/Components/Shared/GroupAvatar";
+import Newgroup from "@/Components/Navbar/Newgroup";
+
+interface groupinterface {
+  _id: string;
+  name: string;
+  grpAvatar: string[];
+  members: User[];
+  creator: string;
+}
 
 const Groups = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [groupShown, setGroupShown] = useState<groupinterface[] | null>(null);
   const navigate = useNavigate();
+  // geting the user from redux store
+  const { user } = useSelector((state: RootState) => state.auth);
 
-  // Dummy user data (replace with Redux later)
-  const currentUser = {
-    id: "1",
-    name: "John Doe",
-    isAdmin: true,
-  };
+  const {
+    data: groups,
+    isLoading,
+    refetch,
+    error,
+    isError,
+  } = useGetAllGroupQuery();
 
-  const selectedGroupDetails = groups.find((g) => g.id === selectedGroup);
-  const isGroupAdmin = selectedGroupDetails?.creator === currentUser.id;
+  const { toast } = useToast();
+  // state variable for newGroup modal
+  const [showNewGroupModal, setShowNewGroupModal] = useState(false);
 
-  const handleGroupAction = (
-    action: "rename" | "delete" | "leave" | "addMember" | "removeMember"
-  ) => {
-    switch (action) {
-      case "rename":
-        console.log("Rename group");
-        break;
-      case "delete":
-        console.log("Delete group");
-        break;
-      case "leave":
-        console.log("Leave group");
-        break;
-      case "addMember":
-        console.log("Add member");
-        break;
-      case "removeMember":
-        console.log("Remove member");
-        break;
+  useEffect(() => {
+    if (groups?.allgroups) {
+      setGroupShown(groups.allgroups);
     }
-  };
+  }, [groups]);
+
+  useEffect(() => {
+    if (searchQuery.trim().length === 0) {
+      setGroupShown(groups?.allgroups);
+    } else {
+      const searchedGroups = groups.allgroups.filter((group) =>
+        group.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setGroupShown(searchedGroups);
+    }
+  }, [searchQuery, groups]);
+
+  // const getAllgroups = async () => {
+  //   try {
+  //     await getAllGroups().then((res) => {
+  //       console.log(res.data.allgroups);
+  //       setgroups(res.data.allgroups);
+  //       setGroupShown(res.data.allgroups);
+  //     });
+  //   } catch (err) {
+  //     if (err instanceof Error) {
+  //       toast({
+  //         variant: "destructive",
+  //         title: `Error-${err.message}`,
+  //       });
+  //     } else {
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Error- Something went wrong",
+  //       });
+  //     }
+  //   }
+  // };
+
+  useEffect(() => {
+    refetch();
+  }, [showNewGroupModal]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: `${error}`,
+    });
+  }
+
+  const selectedGroupDetails = groups?.allgroups.find(
+    (g) => g._id === selectedGroup
+  );
+  const isGroupAdmin = selectedGroupDetails?.creator === user._id;
 
   return (
     <div className="h-screen bg-white dark:bg-black">
@@ -85,55 +146,53 @@ const Groups = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-transparent"
-              prefix={<Search className="w-4 h-4 text-gray-500" />}
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {groups.map((group) => (
-            <Sheet key={group.id}>
-              <SheetTrigger asChild>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-3 rounded-lg cursor-pointer border border-transparent
+          {groupShown &&
+            groupShown.length > 0 &&
+            groupShown.map((group) => (
+              <Sheet key={group._id}>
+                <SheetTrigger asChild>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 rounded-lg cursor-pointer border border-transparent
                     hover:bg-gray-100 dark:hover:bg-zinc-900"
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={group.avatar}
-                      alt={group.name}
-                      className="w-12 h-12 rounded-full"
-                    />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-                        {group.name}
-                      </h3>
-                      <span>
-                        <Users />
-                        <p className="text-sm text-gray-500">
-                          {" "}
-                          {group.members.length} members
-                        </p>
-                      </span>
+                  >
+                    <div className="flex items-center gap-3">
+                      <GroupAvatar avatars={group.grpAvatar} />
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                          {group.name}
+                        </h3>
+                        <span>
+                          <Users />
+                          <p className="text-sm text-gray-500">
+                            {" "}
+                            {group.members.length} members
+                          </p>
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:w-[400px] p-0">
-                <GroupDetails
-                  group={group}
-                  isAdmin={isGroupAdmin}
-                  onAction={handleGroupAction}
-                />
-              </SheetContent>
-            </Sheet>
-          ))}
+                  </motion.div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:w-[400px] p-0">
+                  <GroupDetails group={group} isAdmin={isGroupAdmin} />
+                </SheetContent>
+              </Sheet>
+            ))}
         </div>
 
         <div className="p-4 border-t border-gray-200 dark:border-zinc-800">
-          <Button className="w-full bg-green-500 hover:bg-green-600 dark:bg-[#00A3FF] dark:hover:bg-blue-600">
+          <Button
+            className="w-full bg-green-500 hover:bg-green-600 dark:bg-[#00A3FF] dark:hover:bg-blue-600"
+            onClick={() => {
+              setShowNewGroupModal(true);
+            }}
+          >
             <UserPlus className="w-4 h-4 mr-2" />
             New Group
           </Button>
@@ -161,9 +220,13 @@ const Groups = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-transparent"
-              prefix={<Search className="w-4 h-4 text-gray-500" />}
             />
-            <Button className="w-full bg-green-500 hover:bg-green-600 dark:bg-[#00A3FF] dark:hover:bg-blue-600">
+            <Button
+              className="w-full bg-green-500 hover:bg-green-600 dark:bg-[#00A3FF] dark:hover:bg-blue-600"
+              onClick={() => {
+                setShowNewGroupModal(true);
+              }}
+            >
               <UserPlus className="w-4 h-4 mr-2" />
               New Group
             </Button>
@@ -172,37 +235,36 @@ const Groups = () => {
           {/* Groups List - Scrollable */}
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             <div className="space-y-2">
-              {groups.map((group) => (
-                <motion.div
-                  key={group.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`p-3 rounded-lg cursor-pointer transition-all duration-200 
+              {groupShown &&
+                groupShown.length > 0 &&
+                groupShown.map((group) => (
+                  <motion.div
+                    key={group._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`p-3 rounded-lg cursor-pointer transition-all duration-200 
               ${
-                selectedGroup === group.id
+                selectedGroup === group._id
                   ? "bg-green-500/10 dark:bg-[#00A3FF]/10 border-green-500 dark:border-[#00A3FF]"
                   : "hover:bg-gray-100 dark:hover:bg-zinc-900"
               }
               border border-transparent`}
-                  onClick={() => setSelectedGroup(group.id)}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={group.avatar}
-                      alt={group.name}
-                      className="w-12 h-12 rounded-full"
-                    />
-                    <div>
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-                        {group.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {group.members.length} members
-                      </p>
+                    onClick={() => setSelectedGroup(group._id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <GroupAvatar avatars={group.grpAvatar} />
+
+                      <div>
+                        <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                          {group.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {group.members.length} members
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
             </div>
           </div>
         </div>
@@ -212,7 +274,7 @@ const Groups = () => {
             <GroupDetails
               group={selectedGroupDetails}
               isAdmin={isGroupAdmin}
-              onAction={handleGroupAction}
+              refetch={refetch}
             />
           ) : (
             <div className="h-full flex items-center justify-center text-gray-500">
@@ -221,11 +283,31 @@ const Groups = () => {
           )}
         </div>
       </div>
+      {showNewGroupModal && (
+        <Newgroup
+          isOpen={showNewGroupModal}
+          onClose={() => {
+            setShowNewGroupModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };
 
-const GroupDetails = ({ group, isAdmin, onAction }) => {
+const GroupDetails = ({
+  group,
+  isAdmin,
+  refetch,
+}: {
+  group: groupinterface;
+  isAdmin: boolean;
+  refetch?: () => QueryActionCreatorResult<any> ;
+}) => {
+  const [leaveGroup] = useLeaveGroupMutation();
+  const [removeMember] = useRemoveMembersMutation();
+  const [deleteGroup] = useDeleteGroupMutation();
+
   //we will crate some state variables for showing the modals for  different actions in the page
   //like add member, remove member, rename group, delete group
 
@@ -235,19 +317,63 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
   const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
   const [showLeaveGroupModal, setShowLeaveGroupModal] = useState(false);
 
+  const { toast } = useToast();
+  const [memberToBeRemoved, setMemberToBeRemoved] = useState<string | null>(
+    null
+  );
+
+  //this is the function which will be called when a member is removed or added to refetch chats
+
   //we will create the functions for the confirmation of the different actions
-  const removeConfirm = () => {
-    //we will send the request to the server to remove the member
-    //and then we will close the modal
-    setShowRemoveMemberModal(false);
+  const removeConfirm = async () => {
+    try {
+      //we will send the request to the server to remove the member
+      await removeMember({
+        members: [memberToBeRemoved],
+        chatId: group._id,
+      }).then(() => {
+        refetch();
+        toast({
+          title: "Member Removed",
+          description: "Selected member has been removed from the group",
+        });
+        setShowRemoveMemberModal(false);
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        toast({
+          title: "Error Removing Member",
+          description: `${err.message}`,
+        });
+      } else {
+        toast({
+          title: "Error Removing Member",
+          description: "unknown error occured",
+        });
+      }
+    }
   };
-  const deleteConfirm = () => {
+  const deleteConfirm = async () => {
     //we will send the request to the server to delete the group
+    await deleteGroup(group._id).then(() => {
+      refetch();
+      toast({
+        title: "Group Deleted",
+        description: "Group has been deleted",
+      });
+    });
     //and then we will close the modal
     setShowDeleteGroupModal(false);
   };
-  const leaveConfirm = () => {
+  const leaveConfirm = async () => {
     //we will send the request to the server to leave the group
+    await leaveGroup(group._id).then(() => {
+      refetch();
+      toast({
+        title: "Left Group",
+        description: "You have left the group",
+      });
+    });
     //and then we will close the modal
     setShowLeaveGroupModal(false);
   };
@@ -260,11 +386,7 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <img
-            src={group.avatar}
-            alt={group.name}
-            className="w-16 h-16 rounded-full"
-          />
+          <GroupAvatar avatars={group.grpAvatar} />
           <div>
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
               {group.name}
@@ -283,7 +405,6 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
               <>
                 <DropdownMenuItem
                   onClick={() => {
-                    onAction("rename");
                     setShowRenameGroupModal(true);
                   }}
                 >
@@ -292,7 +413,6 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                    onAction("addMember");
                     setShowAddMemberModal(true);
                   }}
                 >
@@ -303,7 +423,6 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
                 <DropdownMenuItem
                   className="text-red-500"
                   onClick={() => {
-                    onAction("delete");
                     setShowDeleteGroupModal(true);
                   }}
                 >
@@ -315,7 +434,6 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
               <DropdownMenuItem
                 className="text-red-500"
                 onClick={() => {
-                  onAction("leave");
                   setShowLeaveGroupModal(true);
                 }}
               >
@@ -337,7 +455,6 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
               variant="outline"
               size="sm"
               onClick={() => {
-                onAction("addMember");
                 setShowAddMemberModal(true);
               }}
             >
@@ -349,26 +466,26 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {group.members.map((member) => (
             <div
-              key={member.id}
+              key={member._id}
               className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-zinc-900"
             >
               <div className="flex items-center gap-3">
                 <img
-                  src={member.avatar}
-                  alt={member.name}
+                  src={member.profilePic}
+                  alt={member.userName}
                   className="w-10 h-10 rounded-full"
                 />
                 <span className="text-gray-800 dark:text-gray-200">
-                  {member.name}
+                  {member.userName}
                 </span>
               </div>
-              {isAdmin && member.id !== group.creator && (
+              {isAdmin && member._id !== group.creator && (
                 <Button
                   variant="ghost"
                   size="icon"
                   className="text-red-500"
                   onClick={() => {
-                    onAction("removeMember");
+                    setMemberToBeRemoved(member._id);
                     setShowRemoveMemberModal(true);
                   }}
                 >
@@ -384,10 +501,13 @@ const GroupDetails = ({ group, isAdmin, onAction }) => {
       {showRenameGroupModal && (
         <RenameGroupModal
           onClose={setShowRenameGroupModal}
-          currentGroupName={group.name}
+          currentGroupDetail={group}
+          refetch={refetch}
         />
       )}
-      {showAddMemberModal && <AddMemberModal onClose={setShowAddMemberModal} />}
+      {showAddMemberModal && (
+        <AddMemberModal onClose={setShowAddMemberModal} refetch={refetch} group={group} />
+      )}
       {showRemoveMemberModal && (
         <CommonModal
           heading="Remove Member"
@@ -422,7 +542,7 @@ export default Groups;
 
 //Now we will create the modal for renaming the group
 
-const RenameGroupModal = ({ onClose, currentGroupName }) => {
+const RenameGroupModal = ({ onClose, currentGroupDetail,refetch }) => {
   const clickRef = useRef(null);
 
   const clcikHandler = (e: React.MouseEvent) => {
@@ -433,21 +553,51 @@ const RenameGroupModal = ({ onClose, currentGroupName }) => {
   };
 
   const [newGroupName, setNewgroupName] = useState("");
+  const [loading, setloading] = useState(false);
+  const [renameGroup] = useRenameGroupMutation();
+  const { toast } = useToast();
 
   const chageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewgroupName(e.target.value);
   };
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     if (
       newGroupName.trim() === "" ||
-      newGroupName.trim() === currentGroupName
+      newGroupName.trim() === currentGroupDetail.name
     ) {
       return;
     } else {
-      //we will send the request to the server to rename the group
-      //and then we will close the modal
-      onClose(false);
+      try {
+        setloading(true);
+        //we will send the request to the server to rename the group
+        await renameGroup({
+          chatId: currentGroupDetail._id,
+          name: newGroupName,
+        }).then(() => {
+          refetch();
+          toast({
+            title: "Group Renamed",
+            description: "Group name has been updated",
+          });
+          onClose(false);
+        });
+        //and then we will close the modal
+      } catch (err) {
+        if (err instanceof Error) {
+          toast({
+            title: "Error Renaming Group",
+            description: `${err.message}`,
+          });
+        } else {
+          toast({
+            title: "Error Renaming Group",
+            description: "unknown error occured",
+          });
+        }
+      } finally {
+        setloading(false);
+      }
     }
   };
 
@@ -470,8 +620,14 @@ const RenameGroupModal = ({ onClose, currentGroupName }) => {
             onChange={chageHandler}
           />
           <div className="flex justify-start gap-4 ">
-            <Button onClick={submitHandler}>Rename</Button>
-            <Button variant="destructive" onClick={() => onClose(false)}>
+            <Button onClick={submitHandler} disabled={loading}>
+              Rename
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={loading}
+              onClick={() => onClose(false)}
+            >
               Cancel
             </Button>
           </div>
@@ -481,7 +637,12 @@ const RenameGroupModal = ({ onClose, currentGroupName }) => {
   );
 };
 
-const CommonModal = ({ heading, desc, confirm, onClose }) => {
+const CommonModal = ({ heading, desc, confirm, onClose } : {
+  heading: string;
+  desc: string;
+  confirm: () => void;
+  onClose: (val: boolean) => void;
+}) => {
   const clickRef = useRef(null);
 
   const clcikHandler = (e: React.MouseEvent) => {
@@ -516,21 +677,39 @@ const CommonModal = ({ heading, desc, confirm, onClose }) => {
   );
 };
 
-const AddMemberModal = ({ onClose }) => {
+const AddMemberModal = ({ onClose,refetch,group } :{
+  onClose: (val: boolean) => void;
+  refetch: () => QueryActionCreatorResult<any> ;
+  group: groupinterface;
+}) => {
   const clickRef = useRef(null);
-  const [membersToBeAdded, setMembersToBeAdded] = useState([]);
-  const [users, setusers] = useState<User[]>(Sampleusers);
+  const [membersToBeAdded, setMembersToBeAdded] = useState<string[]>([]);
+  const [users, setusers] = useState<User[]>([]);
+  const [usersShown, setUsersShown] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
+  const [addMember] = useAddMembersMutation();
+  const [getMyFriends] = useLazyGetMyFriendsQuery();
 
-  const addMemberHandler = (id) => {
+  const fetchFriends = async () => {
+    await getMyFriends().then((res) => { 
+     setusers(res.data.users);
+     setUsersShown(res.data.users);
+    } )
+  }
+
+  useEffect(() => {
+    fetchFriends();
+  },[])
+
+  const addMemberHandler = (id:string) => {
     if (!membersToBeAdded.includes(id)) {
       setMembersToBeAdded([...membersToBeAdded, id]);
     }
     return;
   };
 
-  const removeMemberHandler = (id) => {
+  const removeMemberHandler = (id:string) => {
     if (membersToBeAdded.includes(id)) {
       const newMembers = membersToBeAdded.filter((member) => member !== id);
       setMembersToBeAdded(newMembers);
@@ -538,28 +717,38 @@ const AddMemberModal = ({ onClose }) => {
     return;
   };
 
-  const isMemberSelected = (id) => {
+  const isMemberSelected = (id:string) => {
     return membersToBeAdded.includes(id);
   };
 
-  const submitHandler = () => {
+  const submitHandler = async() => {
     if (membersToBeAdded.length === 0) {
       onClose(false);
       return;
     }
     //we will send the request to the server to add the members to the group
-    //and then we will close the modal
-    toast({
-      variant: "success",
-      description: `${membersToBeAdded.length} new members added to the Group`,
-    });
+   await addMember({members:membersToBeAdded,chatId:group._id }).then(() => {
+      refetch();
+      toast({
+        variant: "default",
+        description: `${membersToBeAdded.length} new members added to the Group`,
+      });
+      onClose(false);
+   }).catch((err) => {
+    if (err instanceof Error) {
+      toast({
+        variant: "destructive",
+        title: `Error-${err.message}`,
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Error- Something went wrong",
+      });
+    }
+   })
 
-    console.log("Members to be added are : ");
-    membersToBeAdded.forEach((member) => {
-      console.log(member);
-    });
-
-    onClose(false);
+ 
   };
 
   const clcikHandler = (e: React.MouseEvent) => {
@@ -572,12 +761,12 @@ const AddMemberModal = ({ onClose }) => {
   const searchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     if (e.target.value === "") {
-      setusers(Sampleusers);
+      fetchFriends();
       return;
     }
 
-    const newUsers = Sampleusers.filter((user) =>
-      user.username.toLowerCase().includes(e.target.value.toLowerCase())
+    const newUsers = users.filter((user) =>
+      user.userName.toLowerCase().includes(e.target.value.toLowerCase())
     );
 
     setusers(newUsers);
@@ -602,18 +791,17 @@ const AddMemberModal = ({ onClose }) => {
               value={searchQuery}
               onChange={searchHandler}
               className="bg-transparent"
-              prefix={<Search className="w-4 h-4 text-gray-500" />}
             />
 
             <div className="flex flex-col gap-4 h-52 scrollbar-hide overflow-y-auto ">
-              {users && users.length > 0 ? (
-                users.map((user) => (
+              {usersShown && usersShown.length > 0 ? (
+                usersShown.map((user) => (
                   <UserItemForGroup
-                    key={user.id}
+                    key={user._id}
                     user={user}
                     Addhandler={addMemberHandler}
                     Removehandler={removeMemberHandler}
-                    handlerLoading={isMemberSelected(user.id)}
+                    handlerLoading={isMemberSelected(user._id)}
                   />
                 ))
               ) : (

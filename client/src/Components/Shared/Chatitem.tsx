@@ -1,8 +1,9 @@
 import React, { memo } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChatitemProps } from "@/Types/types";
 import AvatarCard from "./AvatarCard";
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import GroupAvatar from "./GroupAvatar";
 
 const Chatitem: React.FC<ChatitemProps> = ({
   avatar = [],
@@ -15,13 +16,13 @@ const Chatitem: React.FC<ChatitemProps> = ({
   newMessageAlert,
   index = 0,
   handleDeleteChat,
-  setIsMobileMenuOpen
+  setIsMobileMenuOpen,
 }) => {
   const navigate = useNavigate();
 
   const clickHandler = () => {
     if (setIsMobileMenuOpen) {
-      setIsMobileMenuOpen();
+      setIsMobileMenuOpen(false);
     }
     navigate(`/chat/${_id}`);
   };
@@ -33,7 +34,6 @@ const Chatitem: React.FC<ChatitemProps> = ({
       onClick={clickHandler}
     >
       <div
-       
         className={cn(
           "flex items-center gap-3 p-3  transition-colors duration-200",
           "hover:bg-gray-100 dark:hover:bg-gray-800/50",
@@ -43,7 +43,11 @@ const Chatitem: React.FC<ChatitemProps> = ({
           "relative"
         )}
       >
-        <AvatarCard avatar={avatar} />
+        {avatar.length > 0 ? (
+          <GroupAvatar avatars={avatar} />
+        ) : (
+          <AvatarCard avatar={avatar} />
+        )}
 
         <div className="flex flex-col">
           <p className="font-medium">{name}</p>
@@ -52,6 +56,13 @@ const Chatitem: React.FC<ChatitemProps> = ({
               {newMessageAlert.count} New Messages
             </span>
           )}
+          {
+            lastMessage && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                {lastMessage}
+              </p>
+            )
+          }
         </div>
 
         {isOnline && (
@@ -62,4 +73,4 @@ const Chatitem: React.FC<ChatitemProps> = ({
   );
 };
 
-export default memo(Chatitem);
+export default Chatitem;

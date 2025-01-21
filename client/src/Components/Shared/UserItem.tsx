@@ -4,11 +4,11 @@ import { memo } from "react";
 
 interface Prop {
   user: User;
-  handler: (id: string) => void;
-  handlerLoading: boolean;
+  handler: (id: string, userName:string) => void;
+  requestStatus:string;
 }
 
-const UserItem: React.FC<Prop> = ({ user, handler, handlerLoading }) => {
+const UserItem: React.FC<Prop> = ({ user, handler, requestStatus }) => {
   const { userName, _id, profilePic } = user;
 
   return (
@@ -17,9 +17,15 @@ const UserItem: React.FC<Prop> = ({ user, handler, handlerLoading }) => {
         <img src={profilePic} alt={userName} className="w-10 h-10 rounded-full" />
         <p>{user.userName}</p>
       </div>
-      <button onClick={() => handler(_id)} disabled={handlerLoading}>
+      {
+        requestStatus === 'no' ? (<button onClick={() => handler(_id,userName)} >
         <PlusCircle size={27} />
-      </button>
+      </button>) : (<span>
+        {
+          requestStatus
+        }
+      </span>)
+      }
     </div>
   );
 };

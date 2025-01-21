@@ -43,6 +43,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { api } from "@/redux/rtkQueryAPIs";
 
 const Searchcomp = lazy(() => import("../Navbar/Search"));
 const NewGroup = lazy(() => import("../Navbar/Newgroup"));
@@ -84,6 +85,7 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
     localStorage.clear();
     dispatch(setUser(null));
     dispatch(setToken(null));
+    dispatch(api.util.resetApiState());
     navigate("/login");
   };
 

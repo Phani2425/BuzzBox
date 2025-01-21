@@ -20,7 +20,7 @@ const AppLayout =
       const chatId = params.id;
       const {toast} = useToast();
 
-      const { data, error, isLoading, isError, refetch } = useMyChatsQuery();
+      const { data, error, isLoading, isError } = useMyChatsQuery();
 
       const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
@@ -87,7 +87,7 @@ const AppLayout =
                   </div>
                 ) : (
                   <ChatList
-                    chats={data.chats}
+                    chats={data?.chats}
                     chatId={chatId}
                     newMessagesAlert={[
                       {
@@ -127,7 +127,7 @@ const AppLayout =
                     </div>
                   ) : (
                     <ChatList
-                      chats={data.chats}
+                      chats={data?.chats}
                       chatId={chatId}
                       newMessagesAlert={[
                         {
@@ -141,7 +141,7 @@ const AppLayout =
                       ]}
                       onlineUsers={["3", "4"]}
                       handleDeleteChat={handledeleteChat}
-                      setIsMobileMenuOpen
+                      setIsMobileMenuOpen={setIsMobileMenuOpen}
                     />
                   )}
                 </div>

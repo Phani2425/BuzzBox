@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from 'react';
+
 export interface ChatitemProps {
     avatar?: string[]
     name?: string
@@ -13,7 +15,7 @@ export interface ChatitemProps {
     index?: number,
     handleDeleteChat?: any,
     members?: string[];
-    setIsMobileMenuOpen?: () => void;
+    setIsMobileMenuOpen?: Dispatch<SetStateAction<boolean>>;
 
 }
 
@@ -21,13 +23,13 @@ export interface chatList {
     w?: string;
     chats?: ChatitemProps[];
     chatId?: string;
-    onlineUsers?: any[];
+    onlineUsers?: string[];
     newMessagesAlert?: {
         chatId:string,
         count:number
     }[];
     handleDeleteChat?: any;
-    setIsMobileMenuOpen?: () => void;
+    setIsMobileMenuOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface User {
@@ -39,10 +41,13 @@ export interface User {
 
 export interface Notifiaction {
     sender:{
-        avatar: string,
-        name: string
+       profilePic:string,
+       userName:string,
+       _id:string
     },
-    _id: string
+    _id: string,
+    status: string,
+    receiver: string,
 }
 
 interface Attachment {

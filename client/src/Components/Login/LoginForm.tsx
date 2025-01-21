@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import {api} from "@/redux/rtkQueryAPIs";
 
 interface loginProp {
   setLogin: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,6 +45,7 @@ const LoginForm: React.FC<loginProp> = ({ setLogin }) => {
         });
         Dispatch(setUser(response.data.user));
         Dispatch(setToken(response.data.token));
+        Dispatch(api.util.resetApiState());
         localStorage.setItem("User", JSON.stringify(response.data.user));
         localStorage.setItem("token", response.data.token);
         navigate("/");

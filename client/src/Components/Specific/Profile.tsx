@@ -1,25 +1,31 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RootState } from "@/main";
+
 import { AtSign, Calendar, LucideIcon, User2Icon } from "lucide-react";
 import moment from "moment";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
+ 
+  const {user} = useSelector((state: RootState) => state.auth);
+
   return (
     <div className="flex flex-col gap-[2rem] items-center py-5">
       <Avatar className="w-40 h-40">
-        <AvatarImage src="https://github.com/shadcn.png" />
-        <AvatarFallback>CN</AvatarFallback>
+        <AvatarImage src={user.profilePic} />
+        <AvatarFallback>US</AvatarFallback>
       </Avatar>
 
-      <ProfileCard heading={"bio"} text={"kdvbvd,vb,c"} />
-      <ProfileCard heading={"UserName"} text={"Phani2425"} Icon={AtSign} />
+      <ProfileCard heading={"bio"} text={user.bio} />
+      <ProfileCard heading={"UserName"} text={user.userName} Icon={AtSign} />
       <ProfileCard
-        heading={"Name"}
-        text={"Phani Bhusan Mohanty"}
+        heading={"Email"}
+        text={user.email}
         Icon={User2Icon}
       />
       <ProfileCard
         heading={"Joined"}
-        text={moment().fromNow()}
+        text={moment(user.createdAt).fromNow()}
         Icon={Calendar}
       />
     </div>

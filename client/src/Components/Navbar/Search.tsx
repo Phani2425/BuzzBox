@@ -11,7 +11,12 @@ import { Label } from "@/components/ui/label";
 import UserItem from "../Shared/UserItem";
 import { useEffect, useState } from "react";
 import { User } from "@/Types/types";
-import { useLazySearchUsersQuery } from "@/redux/rtkQueryAPIs";
+import {
+  useLazyGetRequestsQuery,
+  useLazySearchUsersQuery,
+  useSendFriendRequestMutation,
+} from "@/redux/rtkQueryAPIs";
+import { useToast } from "@/hooks/use-toast";
 
 const Search = ({
   isOpen,
@@ -20,16 +25,50 @@ const Search = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const [isFriendRequestSent, setIsFriendRequestSent] =
-    useState<boolean>(false);
+
   const [userName, setuserName] = useState<string>("");
   const [users, setusers] = useState<User[]>([]);
-
   const [searchUsers] = useLazySearchUsersQuery();
+  const [sendFriendRequest] = useSendFriendRequestMutation();
+  const { toast } = useToast();
 
-  const sendFriendRequest = (id: string) => {
-    console.log(id);
-    setIsFriendRequestSent(true);
+  const [requestData, setrequestData] = useState([]);
+  const [getRequests] = useLazyGetRequestsQuery();
+
+  useEffect(() => {
+    getRequests().then(({data}) => {
+       setrequestData(data.sentRequests);
+    })
+  },[])
+
+
+  const HandlesendFriendRequest = async (id: string, userName: string) => {
+    try {
+      sendFriendRequest(id)
+        .then((res) => {
+          console.log(res);
+          toast({
+            title: "Request Sent",
+            description: `Friend request to ${userName} sent successfully.`,
+          });
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+
+        getRequests().then(({data}) => {
+          setrequestData(data.sentRequests);
+       })
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(
+          "error occured while sending friend request:- ",
+          err.message
+        );
+      } else {
+        console.log("unexpected error occured");
+      }
+    }
   };
 
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,11 +76,12 @@ const Search = ({
   };
 
   useEffect(() => {
-    searchUsers('').then(({data}) => {
-      const trimmedData = data.users.slice(0,7);
+    searchUsers("").then(({ data }) => {
+      const startIndex = Math.random()* (data.users.length/2)
+      const trimmedData = data.users.slice(startIndex, startIndex+7);
       setusers(trimmedData);
-    })
-  },[])
+    });
+  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -61,6 +101,24 @@ const Search = ({
       clearTimeout(timeoutId);
     };
   }, [userName]);
+
+  const getRequestStatus = (id:string) => {
+    
+    if(requestData.length > 0) {
+
+      const req = requestData.find((req) => req.receiver._id === id)
+
+      if(req){
+       return req.status;
+      }
+      else{
+        return 'no'
+      }
+
+    }else{
+      return 'no'
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -91,8 +149,8 @@ const Search = ({
               <UserItem
                 key={user._id}
                 user={user}
-                handler={sendFriendRequest}
-                handlerLoading={isFriendRequestSent}
+                handler={HandlesendFriendRequest}
+                requestStatus={ getRequestStatus(user._id)}
               />
             ))}
         </div>

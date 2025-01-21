@@ -3,7 +3,7 @@ const { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin } = requi
 const { LoginController } = require('../Controllers/AuthController/LoginController');
 const { SignupController, oauthSignup, setUserName } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
-const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat, getMessages } = require('../Controllers/ChatController/chat');
+const { CreateNewGroup,getMyChats, getMyGroupChats, addMembers, removeMember, leaveGroup, sendAttachments, getChatDetails, renameChat, deleteChat, getMessages, getAllGroupChats } = require('../Controllers/ChatController/chat');
 const { ProfileController, SearchUser, sendFriendRequest, acceptFriendRequest, getRequests, rejectFriendRequest, getMyFriends, updateProfile } = require('../Controllers/UserController/ProfileController');
 const { isAdminAuthenticated } = require('../Middlewares/adminAuth');
 const { isAuthenticated } = require('../Middlewares/auth');
@@ -35,6 +35,7 @@ router.put('/user/rejectrequest',isAuthenticated,rejectFriendRequest);
 router.post('/chat/newgroup',isAuthenticated,CreateNewGroup);
 router.get('/chat/mychats',isAuthenticated,getMyChats);
 router.get('/chat/getMyGroups',isAuthenticated,getMyGroupChats);
+router.get('/chat/getallgroups',isAuthenticated,getAllGroupChats);
 router.put('/chat/addmember',isAuthenticated,addMembers);
 router.put('/chat/removemember',isAuthenticated,removeMember);
 router.delete('/chat/leavegroup/:id',isAuthenticated,leaveGroup);
@@ -45,7 +46,7 @@ router.post('/message',isAuthenticated,uploadAttachments.array('files',10),sendA
 //chat related routes
 
 //when multiple controller have same route but different http methods we use route() method along with method chaining
-router.route('/:id').get(isAuthenticated,getChatDetails).put(isAuthenticated,renameChat).delete(isAuthenticated,deleteChat);
+router.route('/chat/:id').get(isAuthenticated,getChatDetails).put(isAuthenticated,renameChat).delete(isAuthenticated,deleteChat);
 
 //this is simmilar to :-
 // router.get('/chat/:id',A);

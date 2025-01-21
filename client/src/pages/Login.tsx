@@ -149,6 +149,7 @@ const Login = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const { user } = result;
       const { displayName, email, photoURL } = user;
+      const isNewUser = result._tokenResponse.isNewUser;
 
       const response = await connectToApi("POST", authEndpoints.oauth , {
         email,
@@ -159,7 +160,9 @@ const Login = () => {
       if (response) {
         dispatch(setUser(response.data.user));
         dispatch(setToken(response.data.token));
-        dispatch(setUserName(false));
+        if(isNewUser){
+          dispatch(setUserName(false));
+        }
         localStorage.setItem("User", JSON.stringify(response.data.user));
         localStorage.setItem("token", response.data.token);
         navigate('/');
@@ -179,6 +182,7 @@ const Login = () => {
       const result = await signInWithPopup(auth, githubProvider);
       const { user } = result;
       const { displayName, email, photoURL } = user;
+      const isNewUser = result._tokenResponse.isNewUser;
 
       const response = await connectToApi("POST", authEndpoints.oauth, {
         email,
@@ -189,7 +193,9 @@ const Login = () => {
       if (response) {
         dispatch(setUser(response.data.user));
         dispatch(setToken(response.data.token));
-        dispatch(setUserName(false));
+        if(isNewUser){
+          dispatch(setUserName(false));
+        }
         localStorage.setItem("User", JSON.stringify(response.data.user));
         localStorage.setItem("token", response.data.token);
         navigate('/');
