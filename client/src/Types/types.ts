@@ -68,5 +68,18 @@ interface Attachment {
     chat: string;
     createdAt: string;
   }
+
+  interface ChatDetails {
+    _id:string;
+    creator:string;
+    groupchat:boolean;
+    members:string[];
+    name:string;
+  }
+
+  interface MessageAlert {
+    chatId:string;
+    count:number;
+  }
   
-  export type { Message, Attachment, MessageSender };
+  export type { Message, Attachment, MessageSender,ChatDetails,MessageAlert };

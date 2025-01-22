@@ -3,7 +3,8 @@ const User = require('../Models/User');
 
 exports.isAuthenticated = (req, res, next) => {
     try {
-        console.log('Cookies:', req.cookies);
+        // console.log('Cookies:', req.cookies);
+        
         // Get token from multiple sources
         let token = req.cookies.token || 
                    (req.headers.authorization && req.headers.authorization.replace('Bearer ', '')) || 
@@ -37,29 +38,29 @@ exports.isAuthenticated = (req, res, next) => {
     }
 };
 
-exports. socketAuthenticator = async (err,socket,next) => {
-  try{
+// exports. socketAuthenticator = async (err,socket,next) => {
+//   try{
 
-    if(err) return next(err);
+//     if(err) return next(err);
 
-    const authToken = socket.request.cookies.token;
+//     const authToken = socket.request.cookies.token;
 
-    if(!authToken) return next(new Error('Token Unavailable'));
+//     if(!authToken) return next(new Error('Token Unavailable'));
 
-    const decodedData = jwt.verify(authToken, process.env.JWT_SECRET);
+//     const decodedData = jwt.verify(authToken, process.env.JWT_SECRET);
 
-    const user = await User.findById(decodedData._id);
+//     const user = await User.findById(decodedData._id);
 
-    if(!user) return next(new Error('User not found'));
+//     if(!user) return next(new Error('User not found'));
 
-    socket.user = user;
+//     socket.user = user;
 
-    return next();
+//     return next();
 
-  }catch(error){
+//   }catch(error){
 
-    console.log(error);
-    return next(new Error('Authentication error'));
+//     console.log(error);
+//     return next(new Error('Authentication error'));
 
-  }
-}
+//   }
+// }

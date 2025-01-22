@@ -211,3 +211,203 @@ Use this method for passing sensitive or temporary data between pages.
 - **`URLSearchParams`**: For working with query strings like `?key=value`.
 
 This covers everything you asked in a simpler way!
+
+36. i used the usecontext hook for the first time and it was not that tough at all it was so weasy:-
+
+explantion:- Here is the **syntax** and **usage** of the Context API in React:
+
+### **1. Create Context**
+```javascript
+import React, { createContext } from 'react';
+
+// Create a context
+const MyContext = createContext();
+```
+
+### **2. Create a Provider Component**
+```javascript
+import React, { useState } from 'react';
+
+const MyProvider = ({ children }) => {
+    const [state1, setState1] = useState("value1");
+    const [state2, setState2] = useState("value2");
+
+    // Context value
+    const value = {
+        state1,
+        setState1,
+        state2,
+        setState2
+    };
+
+    return (
+        <MyContext.Provider value={value}>
+            {children}
+        </MyContext.Provider>
+    );
+};
+
+export { MyContext, MyProvider };
+```
+
+### **3. Use Context in Child Components**
+```javascript
+import React, { useContext } from 'react';
+import { MyContext } from './path_to_context_file';
+
+const MyComponent = () => {
+    const { state1, setState1, state2, setState2 } = useContext(MyContext);
+
+    return (
+        <div>
+            <p>State 1: {state1}</p>
+            <p>State 2: {state2}</p>
+            <button onClick={() => setState1("new value 1")}>Update State 1</button>
+            <button onClick={() => setState2("new value 2")}>Update State 2</button>
+        </div>
+    );
+};
+
+export default MyComponent;
+```
+
+### **4. Wrap Your App with the Provider**
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { MyProvider } from './path_to_context_file';
+import MyComponent from './MyComponent';
+
+ReactDOM.render(
+    <MyProvider>
+        <MyComponent />
+    </MyProvider>,
+    document.getElementById('root')
+);
+```
+
+---
+
+### **How It Works**
+- **`createContext`**: Creates a context object.
+- **`useContext`**: Allows components to access the values provided by the context.
+- **Provider Component**: Wraps the entire component tree or a specific part to provide state values.
+- **State Sharing**: Any state managed in the provider is accessible to all child components without prop drilling.
+
+This allows you to save and manage the state of multiple things and share them across components in a clean and efficient manner.
+
+37.  //when a key in an object is an variable then that key is called dynamic key and that can be written inside the square bracket : - [DynamicKey]
+
+38.   const StartTypingEventHandler = ({ chatId, sender }: { chatId: string, sender: { _id: string, name: string } }) => {
+    if (chatId === id && sender._id !== user._id) {
+      setIsTyping(true);
+      setTypingUser(sender.name);
+    }
+  };
+
+  const StopTypingEventHandler = ({ chatId, sender }: { chatId: string, sender: { _id: string, name: string } }) => {
+    if (chatId === id && sender._id !== user._id) {
+      setIsTyping(false);
+      setTypingUser(null);
+    }
+  }; 
+
+  only chage the state when the chat is opened and you are not the sender else ddonnt do anything
+
+  39. generally we were putting the timeout in the useeffect hwere returing the cleaner function was easy but what if we use te timeout in other function outside useffect how we are goinng to do it:- I implemented such a fun here in which when user types the function get called and after some time of  stoping the typing it emits stop typing event and we are doing it through setTimeOut() but if we dont clear it then the no of time the function is called that much time a new setTimeOut() will be created which is not correct so what we will do is in that starting of fuction we will clear the timeout if any exists.
+
+  so we will declare a variable outside the function which will store the timeOutId [whose type is [NodeJs.Timeout] ] and we will pass that in clearTimeout() function in the top of the function so that if any timeout exists then that will get cleared.and next timeout will be implemented.
+
+
+  const loggedUser = user;
+
+  let typingTimeout: NodeJS.Timeout;
+
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    clearTimeout(typingTimeout);
+
+    setMessage(e.target.value);
+    socket.emit(START_TYPING, { chatId: id,members: chat?.members });
+
+    typingTimeout = setTimeout(() => {
+
+      socket.emit(STOP_TYPING, { chatId: id,members: chat?.members });
+
+    },2000)
+  };
+
+  40. i learned two eventhandler :- onFocus and onBlur
+  :-onfocus:- triggered when user clicks the input 
+  :- onblur:- teriggered when user moves away from the input
+
+  `onfocus` and `onblur` are HTML event attributes used to handle focus-related events in JavaScript. They are not limited to the `<input>` element but are most commonly associated with form elements such as `<input>`, `<textarea>`, and `<select>`.
+
+### **What `onfocus` and `onblur` do:**
+
+1. **`onfocus`:**
+   - Triggered when an element gains focus.
+   - Commonly used to handle tasks when a user selects or activates an interactive element.
+   - Example: Highlighting a text field or displaying a help tooltip.
+
+   ```html
+   <input type="text" onfocus="console.log('Input gained focus')" />
+   ```
+
+2. **`onblur`:**
+   - Triggered when an element loses focus.
+   - Often used for validation or resetting UI changes made during focus.
+   - Example: Validating input when the user moves away from a field.
+
+   ```html
+   <input type="text" onblur="console.log('Input lost focus')" />
+   ```
+
+---
+
+### **Usage Beyond `<input>` Elements:**
+
+While these attributes are most commonly used with input fields, they can be applied to other focusable elements, including:
+- `<textarea>`: For handling focus on a text area.
+- `<select>`: For dropdown menus.
+- `<button>`: When a button gains or loses focus.
+- `<a>`: For focusable links.
+- Any custom element or element made focusable via the `tabindex` attribute.
+
+Example with a `<textarea>`:
+```html
+<textarea onfocus="console.log('Textarea focused')" onblur="console.log('Textarea blurred')"></textarea>
+```
+
+Example with `tabindex`:
+```html
+<div tabindex="0" onfocus="console.log('Div focused')" onblur="console.log('Div blurred')">
+  Focusable Div
+</div>
+```
+
+---
+
+### **Common Use Cases:**
+- **Styling:** Changing the visual appearance of an element during focus or after blur.
+  ```html
+  <input type="text" 
+         onfocus="this.style.border='2px solid blue'" 
+         onblur="this.style.border='1px solid gray'" />
+  ```
+- **Validation:** Validating form fields after the user finishes interacting with them.
+  ```html
+  <input type="email" onblur="validateEmail(this)" />
+  <script>
+    function validateEmail(field) {
+      const isValid = field.value.includes('@');
+      if (!isValid) alert('Please enter a valid email address.');
+    }
+  </script>
+  ```
+- **Accessibility Enhancements:** Providing assistive text or guidance when a user focuses on a field.
+
+---
+
+### **Conclusion:**
+`onfocus` and `onblur` are versatile and applicable to any focusable element, not just `<input>`. They are essential for creating interactive and accessible web applications.

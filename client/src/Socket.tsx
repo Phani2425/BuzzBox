@@ -1,23 +1,27 @@
 import { createContext, useContext, useMemo } from "react";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import {RootState} from '@/main'
 import { useSelector } from "react-redux";
 
-const socketContext = createContext();
+const socketContext = createContext<Socket | undefined>(undefined);
 
-const getSocket = () => {
-  return useContext(socketContext);
+const getSocket = (): Socket => {
+  const socket = useContext(socketContext);
+  if (!socket) {
+    throw new Error("Socket not found. Make sure you are using the SocketProvider.");
+  }
+  return socket;
 };
 
-const SocketProvider = ({ children }) => {
+const SocketProvider = ({ children } :{children:React.ReactNode}) => {
 
   const token = useSelector((state:RootState) => state.auth.token);
 
-  const socket = useMemo(
+  const socket:Socket = useMemo(
     () => io(import.meta.env.VITE_SERVER_URL, { withCredentials: true,query: {
       token, // Pass token as query parameter
     } }),
-    []
+    [token]
   );
 
   return (

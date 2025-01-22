@@ -8,23 +8,19 @@ const router = require("./Routes/route");
 // const { createFakeUser } = require('./seeders/userseed');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const { NEW_MESSAGE_ALERT, NEW_MESSAGE } = require("./Constants/events");
+const { NEW_MESSAGE_ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } = require("./Constants/events");
 const { v4: uuidv4 } = require("uuid");
 const { getSockets } = require("./Utils/utilityFunctions");
 const Message = require("./Models/Message");
 const { corsOption } = require("./Constants/config");
 const jwt = require("jsonwebtoken");
 const User = require("./Models/User");
-const { addUserSocket,
-    removeUserSocket,
-     } = require('./socketManager');
+const { addUserSocket, removeUserSocket } = require("./socketManager");
 const { default: mongoose } = require("mongoose");
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, { cors: corsOption });
-
-
 
 app.use(cors(corsOption));
 
@@ -78,7 +74,7 @@ io.on("connection", (socket) => {
 
   console.log("a user connected with socket id", socket.id);
 
-//   console.log("userSocketMap", userSocketMap);
+  //   console.log("userSocketMap", userSocketMap);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealtime = {
@@ -87,26 +83,20 @@ io.on("connection", (socket) => {
       content: message,
       sender: {
         _id: user._id,
-        name: user.name,
+        name: user.userName,
       },
       createdAt: new Date().toISOString(),
     };
 
-    console.log("message received", messageForRealtime);
-
     const membersSocketId = getSockets(members);
+    console.log("membersSocketId", membersSocketId);
     io.to(membersSocketId).emit(NEW_MESSAGE, {
       chatId,
       message: messageForRealtime,
     });
 
-    io.to(socket.id).emit(NEW_MESSAGE_ALERT, {
+    socket.broadcast.emit(NEW_MESSAGE_ALERT, {
       chatId,
-    });
-
-    socket.on("disconnect", () => {
-      removeUserSocket(user._id.toString());
-      console.log("user disconnected with socket id", socket.id);
     });
 
     try {
@@ -121,6 +111,35 @@ io.on("connection", (socket) => {
     } catch (err) {
       console.log("error occured while saving the message in db", err.message);
     }
+  });
+
+  socket.on(START_TYPING, ({chatId,members}) => {
+    const  membersExceptSender = members.filter(member => member !== user._id);
+    const membersSocketId = getSockets(membersExceptSender);
+    io.to(membersSocketId).emit(START_TYPING, {
+      chatId,
+      sender: {
+        _id: user._id,
+        name: user.userName,
+      },
+    });
+  })
+
+   socket.on(STOP_TYPING, ({chatId,members}) => {
+    const  membersExceptSender = members.filter(member => member !== user._id);
+    const membersSocketId = getSockets(membersExceptSender);
+    io.to(membersSocketId).emit(STOP_TYPING, {
+      chatId,
+      sender: {
+        _id: user._id,
+        name: user.userName,
+      },
+    });
+  })
+
+  socket.on("disconnect", () => {
+    removeUserSocket(user._id.toString());
+    console.log("user disconnected with socket id", socket.id);
   });
 });
 

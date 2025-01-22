@@ -9,6 +9,9 @@ import { useMyChatsQuery } from "@/redux/rtkQueryAPIs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { getSocket } from "@/Socket";
+import { NEW_MESSAGE_ALERT } from "@/constants/events";
+import { useSocketEvent } from "@/hooks/utilityHooks";
+import { MessageAlert } from "@/Types/types";
 
 type WrappedComponentProps = {
   [key: string]: any; // Use appropriate type for your props
@@ -17,17 +20,18 @@ type WrappedComponentProps = {
 const AppLayout =
   () => (WrappedComponent: React.ComponentType<WrappedComponentProps>) => {
     return (props: WrappedComponentProps) => {
-
       const socket = getSocket();
       console.log(socket.id);
-       
+
       const params = useParams();
-      const chatId = params.id;
-      const {toast} = useToast();
+      const CurrentchatId = params.id;
+      const { toast } = useToast();
 
       const { data, error, isLoading, isError } = useMyChatsQuery();
 
       const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+      const [newMessaegAlerts, setNewMessageAlerts] = useState<MessageAlert[]>([]);
 
       useEffect(() => {
         if (isError) {
@@ -40,6 +44,17 @@ const AppLayout =
         }
       }, [error, isError]);
 
+      // here we need to add another useEffect having chatId as its depency so that when ever user selects achat the chatid changes and if we have any chatAlerts in that chatid then we will remove that
+      useEffect(() => {
+        const chatAlert = newMessaegAlerts.find((alert) => alert.chatId === CurrentchatId);
+        if (chatAlert) {
+          const updatedAlerts = newMessaegAlerts.filter(
+            (alert) => alert.chatId !== CurrentchatId
+          );
+          setNewMessageAlerts(updatedAlerts);
+        }
+      }, [CurrentchatId]);
+
       const handledeleteChat = (
         e: React.MouseEvent<HTMLDivElement>,
         _id: string,
@@ -51,6 +66,38 @@ const AppLayout =
           console.log("Delete Chat", _id);
         }
       };
+
+      const NewMessageAlertEventHandler = ({ chatId }: { chatId: string }) => {
+
+        // the second chat id is the param we got using useparams .it is the of the currentlyy opened chat.
+        // so if the alert is for the curently opened chat then do nothing
+
+        if(chatId === CurrentchatId) return;
+
+        //here we wil update the state of newmessageAlert array
+        const chatExist = newMessaegAlerts.find((alert) => alert.chatId === chatId);
+        if (chatExist) {
+          const updatedAlerts = newMessaegAlerts.map((alert) => {
+            if (alert.chatId === chatId) {
+              return {
+                chatId,
+                count: alert.count + 1,
+              };
+            } else {
+              return alert;
+            }
+          });
+          setNewMessageAlerts(updatedAlerts);
+        } else {
+          setNewMessageAlerts((prev) => [...prev, { chatId, count: 1 }]);
+        }
+      };
+
+      const EventToHandlerMappingObject = {
+        [NEW_MESSAGE_ALERT]: NewMessageAlertEventHandler,
+      };
+
+      useSocketEvent(socket, EventToHandlerMappingObject);
 
       return (
         <div className="relative min-h-screen overflow-hidden bg-white dark:bg-black ">
@@ -93,17 +140,8 @@ const AppLayout =
                 ) : (
                   <ChatList
                     chats={data?.chats}
-                    chatId={chatId}
-                    newMessagesAlert={[
-                      {
-                        chatId: "1",
-                        count: 5,
-                      },
-                      {
-                        chatId: "2",
-                        count: 3,
-                      },
-                    ]}
+                    chatId={CurrentchatId}
+                    newMessagesAlert={newMessaegAlerts}
                     onlineUsers={["3", "4"]}
                     handleDeleteChat={handledeleteChat}
                   />
@@ -133,17 +171,8 @@ const AppLayout =
                   ) : (
                     <ChatList
                       chats={data?.chats}
-                      chatId={chatId}
-                      newMessagesAlert={[
-                        {
-                          chatId: "1",
-                          count: 5,
-                        },
-                        {
-                          chatId: "2",
-                          count: 3,
-                        },
-                      ]}
+                      chatId={CurrentchatId}
+                      newMessagesAlert={newMessaegAlerts}
                       onlineUsers={["3", "4"]}
                       handleDeleteChat={handledeleteChat}
                       setIsMobileMenuOpen={setIsMobileMenuOpen}

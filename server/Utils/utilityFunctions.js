@@ -5,9 +5,8 @@ exports.getOtherMember = (members, id) => {
 };
 
 exports.getSockets = (users = []) => {
-    console.log(userSocketMap);
     if (!userSocketMap) {
       throw new Error('userSocketMap is not initialized');
     }
-    return users.map((user) => userSocketMap.get(user._id));
+    return users.map((user) => userSocketMap.get(user));
   };
