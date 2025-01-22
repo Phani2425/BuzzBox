@@ -123,6 +123,7 @@ exports.getMyChats = async (req, resp) => {
     }
 }
 
+
 //controller for fetching group chats which is created by me
 exports.getMyGroupChats = async (req, resp) => {
     try {

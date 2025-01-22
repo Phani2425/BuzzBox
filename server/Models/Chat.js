@@ -26,4 +26,7 @@ const ChatSchema = new mongoose.Schema({
 
 },{timestamos:true});
 
+//creating index for  faster query whhile searching for all the group in which a user is memeber , this  query takes  place when a user reconnects a socket and we need to join him in all the rooms he is a member of
+ChatSchema.index({members:1, groupChat:1});
+
 module.exports = mongoose.model('Chat',ChatSchema);

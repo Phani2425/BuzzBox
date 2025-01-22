@@ -23,7 +23,6 @@ import { useToast } from "@/hooks/use-toast";
 import type { ChatDetails, Message } from "@/Types/types";
 import { useSocketEvent } from "@/hooks/utilityHooks";
 import BouncingDotsLoader from "@/Components/Loader/BouncingDotLoader";
-
 import { motion } from "framer-motion";
 
 const Chat = () => {

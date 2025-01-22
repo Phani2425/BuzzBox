@@ -21,6 +21,9 @@ const MessageComponent = ({ msg, loggedUser }) => {
               : "bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-gray-200"
           } shadow-md backdrop-blur-sm`}
         >
+          {
+            msg.sender._id !== loggedUser._id && (<p className="text-xs mb-1 dark:text-green-500 text-blue-600">{msg.sender.userName}</p>)
+          }
           {msg.content && <p className="text-sm md:text-base">{msg.content}</p>}
 
           {msg.attachments && msg.attachments.length > 0 && (

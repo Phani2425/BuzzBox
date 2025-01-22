@@ -22,36 +22,43 @@ const AdminLayout = lazy(() => import("./Components/Layout/AdminLayout"));
 function App() {
   return (
     <Suspense fallback={<Loaders />}>
-      <SocketProvider>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <RouteProtector redirect="/login" role="user">
-              
-                <Home />
-              
-            </RouteProtector>
-          }
-        />
         <Route path="/username" element={<SetUserNameModal />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/chat/:id"
-          element={
-            <RouteProtector redirect="/login" role="user">
-              <Chat />
-            </RouteProtector>
-          }
-        />
-        <Route
-          path="/group"
-          element={
-            <RouteProtector redirect="/login" role="user">
-              <Group />
-            </RouteProtector>
-          }
-        />
+
+        
+          <Route
+            path="/"
+            element={
+              <RouteProtector redirect="/login" role="user">
+                <SocketProvider>
+                <Home />
+                </SocketProvider>
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/chat/:id"
+            element={
+              <RouteProtector redirect="/login" role="user">
+                <SocketProvider>
+                <Chat />
+                </SocketProvider>
+              </RouteProtector>
+            }
+          />
+          <Route
+            path="/group"
+            element={
+              <RouteProtector redirect="/login" role="user">
+                <SocketProvider>
+                <Group />
+                </SocketProvider>
+              </RouteProtector>
+            }
+          />
+        
+
         <Route path="*" element={<PageNotFound />} />
         <Route path="/admin" element={<AdminLogin />} />
 
@@ -71,7 +78,6 @@ function App() {
           <Route path="/admin/dashboard/settings" element={<Settings />} />
         </Route>
       </Routes>
-      </SocketProvider>
     </Suspense>
   );
 }

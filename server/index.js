@@ -10,7 +10,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { NEW_MESSAGE_ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } = require("./Constants/events");
 const { v4: uuidv4 } = require("uuid");
-const { getSockets } = require("./Utils/utilityFunctions");
+const { getSockets, getAllGroups } = require("./Utils/utilityFunctions");
 const Message = require("./Models/Message");
 const { corsOption } = require("./Constants/config");
 const jwt = require("jsonwebtoken");
@@ -54,7 +54,14 @@ io.use(async (socket, next) => {
     next(new Error("Authentication error"));
   }
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  let decoded;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decodedData) => {
+    if (err) {
+      console.error(err.message, `in socket:- ${socket.id}`);
+    }
+    decoded = decodedData;
+  });
+   
 
   const user = await User.findById(decoded.id);
   if (!user) {
@@ -64,13 +71,19 @@ io.use(async (socket, next) => {
   next();
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   //assuming we have user info
   const user = socket.user;
 
   //mapping the user id with its socket id
   addUserSocket(user._id.toString(), socket.id);
   //there will be a function named as getSocketID() which will take user id and return the current corresponding socket id
+
+  const groupsToJoin = await getAllGroups(user._id);
+  //joining the user to all the groups he is a member of
+  groupsToJoin.forEach((group) => {
+    socket.join(group._id.toString());
+  });
 
   console.log("a user connected with socket id", socket.id);
 
@@ -83,13 +96,14 @@ io.on("connection", (socket) => {
       content: message,
       sender: {
         _id: user._id,
-        name: user.userName,
+        userName: user.userName,
       },
       createdAt: new Date().toISOString(),
     };
 
     const membersSocketId = getSockets(members);
-    console.log("membersSocketId", membersSocketId);
+    // console.log("membersSocketId", membersSocketId);
+    
     io.to(membersSocketId).emit(NEW_MESSAGE, {
       chatId,
       message: messageForRealtime,
