@@ -5,11 +5,11 @@ import Navbar from "./Navbar";
 import ChatList from "../Specific/ChatList";
 import { useParams } from "react-router-dom";
 import Profile from "../Specific/Profile";
-import { useMyChatsQuery } from "@/redux/rtkQueryAPIs";
+import { useLazyGetUnreadMessagesQuery, useMyChatsQuery } from "@/redux/rtkQueryAPIs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { getSocket } from "@/Socket";
-import { NEW_MESSAGE_ALERT } from "@/constants/events";
+import { NEW_MESSAGE_ALERT, ONLINE_USERS } from "@/constants/events";
 import { useSocketEvent } from "@/hooks/utilityHooks";
 import { MessageAlert } from "@/Types/types";
 
@@ -31,7 +31,44 @@ const AppLayout =
 
       const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
-      const [newMessaegAlerts, setNewMessageAlerts] = useState<MessageAlert[]>([]);
+      const [newMessaegAlerts, setNewMessageAlerts] = useState<MessageAlert[]>(
+        []
+      );
+      const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+
+      const [getUnreadMessages] = useLazyGetUnreadMessagesQuery();
+
+      const fetchUnreadMessages = async() => {
+        try{
+
+          await getUnreadMessages().then((res) => {
+            console.log('unread messages:- ',res.data.result);
+            setNewMessageAlerts(res.data.result);
+          })
+
+        }catch(err){
+          if(err instanceof Error){
+            console.log("Error fetching the unread messages", err);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: `Error fetching the unread messages:- ${err.message}`,
+            });
+            
+        }
+        else{
+          console.log("Error fetching the unread messages", err);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: `Error fetching the unread messages:- ${err}`,
+          });
+        }
+      }}
+
+      useEffect(() => {
+         fetchUnreadMessages();
+      },[])
 
       useEffect(() => {
         if (isError) {
@@ -46,14 +83,16 @@ const AppLayout =
 
       // here we need to add another useEffect having chatId as its depency so that when ever user selects achat the chatid changes and if we have any chatAlerts in that chatid then we will remove that
       useEffect(() => {
-        const chatAlert = newMessaegAlerts.find((alert) => alert.chatId === CurrentchatId);
+        const chatAlert = newMessaegAlerts.find(
+          (alert) => alert.chatId === CurrentchatId
+        );
         if (chatAlert) {
           const updatedAlerts = newMessaegAlerts.filter(
             (alert) => alert.chatId !== CurrentchatId
           );
           setNewMessageAlerts(updatedAlerts);
         }
-      }, [CurrentchatId]);
+      }, [CurrentchatId,newMessaegAlerts]);
 
       const handledeleteChat = (
         e: React.MouseEvent<HTMLDivElement>,
@@ -68,14 +107,15 @@ const AppLayout =
       };
 
       const NewMessageAlertEventHandler = ({ chatId }: { chatId: string }) => {
-
         // the second chat id is the param we got using useparams .it is the of the currentlyy opened chat.
         // so if the alert is for the curently opened chat then do nothing
 
-        if(chatId === CurrentchatId) return;
+        if (chatId === CurrentchatId) return;
 
         //here we wil update the state of newmessageAlert array
-        const chatExist = newMessaegAlerts.find((alert) => alert.chatId === chatId);
+        const chatExist = newMessaegAlerts.find(
+          (alert) => alert.chatId === chatId
+        );
         if (chatExist) {
           const updatedAlerts = newMessaegAlerts.map((alert) => {
             if (alert.chatId === chatId) {
@@ -93,8 +133,15 @@ const AppLayout =
         }
       };
 
+      //this is the function which will get called when a online users event is emited from server and it will recieve a map of userId as key and the socketid as value
+      //it will be transimited from the server only when you as a user connects to the socket and any other disconnects with the socket
+      const onlineUserhandler = (onlineUsers: string[]) => {
+        setOnlineUsers(onlineUsers);
+      };
+
       const EventToHandlerMappingObject = {
         [NEW_MESSAGE_ALERT]: NewMessageAlertEventHandler,
+        [ONLINE_USERS]: onlineUserhandler,
       };
 
       useSocketEvent(socket, EventToHandlerMappingObject);
@@ -116,12 +163,12 @@ const AppLayout =
             }}
           />
 
-          <div className="h-[calc(100vh-4rem)] px-4 py-6">
+          <div className="h-[calc(100vh-4rem)] px-4 py-6 w-screen">
             <Navbar
               isMobileMenuOpen={isMobileMenuOpen}
               setIsMobileMenuOpen={setIsMobileMenuOpen}
             />
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] gap-6 h-[calc(100%-2rem)] mt-8 ">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] gap-6 h-[calc(100%-2rem)] mt-8  ">
               {/* Left section */}
               <div
                 className={`hidden md:block glassmorphism rounded-2xl overflow-y-auto scrollbar-hide ${
@@ -142,7 +189,7 @@ const AppLayout =
                     chats={data?.chats}
                     chatId={CurrentchatId}
                     newMessagesAlert={newMessaegAlerts}
-                    onlineUsers={["3", "4"]}
+                    onlineUsers={onlineUsers}
                     handleDeleteChat={handledeleteChat}
                   />
                 )}

@@ -1,4 +1,5 @@
 const Chat = require('../Models/Chat');
+const User = require('../Models/User');
 const { userSocketMap } = require('../socketManager');
 
 exports.getOtherMember = (members, id) => {
@@ -28,4 +29,22 @@ exports.getSockets = (users = []) => {
           return [];
   
       }
+  }
+
+  // function thhat will save the last seen of the user in the user database when it is called
+  exports. saveLastSeen = async (userId) => {
+    try{
+
+      const user = await User.findById(userId);
+      if(!user){
+        console.log('user not found while saving the last seen');
+        return;
+      }
+      user.lastSeen = new Date();
+
+      await user.save();
+
+    }catch(err){
+      console.log('error occured while saving the last seen time of the user',err.message);
+    }
   }

@@ -16,6 +16,8 @@ const ChatList: React.FC<chatList> = ({
   handleDeleteChat,
   setIsMobileMenuOpen
 }) => {
+
+
   return (
     <div className={`w-[${w}] flex flex-col`}>
       {chats.map((chat, index) => {
@@ -26,7 +28,7 @@ const ChatList: React.FC<chatList> = ({
         );
 
         const isOnline = members?.some((member: string) =>
-          onlineUsers.includes(member)
+           onlineUsers.includes(member)
         );
 
         return (
@@ -36,10 +38,9 @@ const ChatList: React.FC<chatList> = ({
             avatar={avatar}
             name={name}
             groupChat={groupChat}
-            members={members}
             _id={_id}
             key={_id}
-            sameSender={chatId === _id}
+            chatSelected={chatId === _id}
             handleDeleteChat={handleDeleteChat}
             index={index}
             setIsMobileMenuOpen={setIsMobileMenuOpen}

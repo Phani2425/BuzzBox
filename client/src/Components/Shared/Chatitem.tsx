@@ -11,7 +11,7 @@ const Chatitem: React.FC<ChatitemProps> = ({
   _id,
   lastMessage,
   groupChat = false,
-  sameSender,
+  chatSelected,
   isOnline,
   newMessageAlert,
   index = 0,
@@ -37,7 +37,7 @@ const Chatitem: React.FC<ChatitemProps> = ({
         className={cn(
           "flex items-center gap-3 p-3  transition-colors duration-200",
           "hover:bg-gray-100 dark:hover:bg-gray-800/50",
-          sameSender
+          chatSelected
             ? "bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             : "bg-transparent dark:bg-transparent text-gray-700 dark:text-gray-300",
           "relative"

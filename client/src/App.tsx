@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import "./App.css";
 import RouteProtector from "./Components/ProtectedRoute/RouteProtector";
 import PageNotFound from "./Components/Shared/PagerNotFound";
 import Loaders from "./Components/Shared/Loaders";
@@ -69,9 +68,9 @@ function App() {
               <AdminLayout />
             </RouteProtector>
           }
-          outlet
+          
         >
-          <Route default path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route index path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/dashboard/users" element={<Users />} />
           <Route path="/admin/dashboard/groups" element={<Groups />} />
           <Route path="/admin/dashboard/messages" element={<Messages />} />

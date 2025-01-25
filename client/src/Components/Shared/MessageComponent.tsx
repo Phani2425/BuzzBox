@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FindFileType } from "../../utils/utilities";
 import { transformImage } from "../../utils/utilities";
+import { File, FileCode, FileSpreadsheet, FileText } from "lucide-react";
 
 const MessageComponent = ({ msg, loggedUser }) => {
   return (
@@ -21,9 +22,11 @@ const MessageComponent = ({ msg, loggedUser }) => {
               : "bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-gray-200"
           } shadow-md backdrop-blur-sm`}
         >
-          {
-            msg.sender._id !== loggedUser._id && (<p className="text-xs mb-1 dark:text-green-500 text-blue-600">{msg.sender.userName}</p>)
-          }
+          {msg.sender._id !== loggedUser._id && (
+            <p className="text-xs mb-1 dark:text-green-500 text-blue-600">
+              {msg.sender.userName}
+            </p>
+          )}
           {msg.content && <p className="text-sm md:text-base">{msg.content}</p>}
 
           {msg.attachments && msg.attachments.length > 0 && (
@@ -41,7 +44,7 @@ const MessageComponent = ({ msg, loggedUser }) => {
                         target="_blank"
                       >
                         <img
-                          src={transformImage (attachment.url,200)}
+                          src={transformImage(attachment.url, 200)}
                           alt="attachment"
                           className="w-full h-full object-cover rounded-lg"
                         />
@@ -55,7 +58,7 @@ const MessageComponent = ({ msg, loggedUser }) => {
                         className="w-full h-full object-cover rounded-lg"
                       />
                     )}
-                    {fileType === "audio" && (
+                    {fileType === "raw" && (
                       <audio
                         src={attachment.url}
                         controls
@@ -67,9 +70,47 @@ const MessageComponent = ({ msg, loggedUser }) => {
                         href={attachment.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-white  hover:underline"
+                        className="flex items-center gap-2 px-3 py-2 bg-gray-700/40 rounded-md hover:bg-gray-700/60 transition-all max-w-[200px]"
                       >
-                        {attachment.url.split(".").pop()} File
+                        {(() => {
+                          const extension = attachment.url
+                            .split(".")
+                            .pop()
+                            ?.toLowerCase();
+
+                          switch (extension) {
+                            case "pdf":
+                              return (
+                                <FileText className="w-5 h-5 text-red-400" />
+                              );
+                            case "doc":
+                            case "docx":
+                              return (
+                                <FileText className="w-5 h-5 text-blue-400" />
+                              );
+                            case "xls":
+                            case "xlsx":
+                              return (
+                                <FileSpreadsheet className="w-5 h-5 text-green-400" />
+                              );
+                            case "txt":
+                            case "js":
+                            case "ts":
+                              return (
+                                <FileCode className="w-5 h-5 text-yellow-400" />
+                              );
+                            default:
+                              return <File className="w-5 h-5 text-gray-400" />;
+                          }
+                        })()}
+                        <div className="flex flex-col text-sm overflow-hidden">
+                          <span className="truncate">
+                            {attachment.url.split("/").pop()?.split(".")[0]}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            .{attachment.url.split(".").pop()?.toLowerCase()}
+                          </span>
+                        </div>
                       </a>
                     )}
                   </div>

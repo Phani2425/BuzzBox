@@ -8,19 +8,21 @@ const router = require("./Routes/route");
 // const { createFakeUser } = require('./seeders/userseed');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const { NEW_MESSAGE_ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } = require("./Constants/events");
+const { NEW_MESSAGE_ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING, ONLINE_USERS } = require("./Constants/events");
 const { v4: uuidv4 } = require("uuid");
-const { getSockets, getAllGroups } = require("./Utils/utilityFunctions");
+const { getSockets, getAllGroups, saveLastSeen } = require("./Utils/utilityFunctions");
 const Message = require("./Models/Message");
 const { corsOption } = require("./Constants/config");
 const jwt = require("jsonwebtoken");
 const User = require("./Models/User");
-const { addUserSocket, removeUserSocket } = require("./socketManager");
+const { addUserSocket, removeUserSocket, userSocketMap } = require("./socketManager");
 const { default: mongoose } = require("mongoose");
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, { cors: corsOption });
+
+app.set('io', io);
 
 app.use(cors(corsOption));
 
@@ -77,6 +79,11 @@ io.on("connection", async (socket) => {
 
   //mapping the user id with its socket id
   addUserSocket(user._id.toString(), socket.id);
+
+  let onlineUser = Array.from(userSocketMap.keys());
+
+io.emit(ONLINE_USERS, onlineUser);
+
   //there will be a function named as getSocketID() which will take user id and return the current corresponding socket id
 
   const groupsToJoin = await getAllGroups(user._id);
@@ -86,6 +93,7 @@ io.on("connection", async (socket) => {
   });
 
   console.log("a user connected with socket id", socket.id);
+
 
   //   console.log("userSocketMap", userSocketMap);
 
@@ -151,8 +159,12 @@ io.on("connection", async (socket) => {
     });
   })
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async() => {
     removeUserSocket(user._id.toString());
+    onlineUser = Array.from(userSocketMap.keys());
+    io.emit(ONLINE_USERS, onlineUser);
+    //saving the last seen time in user model
+    await saveLastSeen(user._id);
     console.log("user disconnected with socket id", socket.id);
   });
 });

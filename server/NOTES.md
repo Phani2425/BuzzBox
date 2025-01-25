@@ -75,3 +75,7 @@ exports. socketAuthenticator = async (err,socket,next) => {
 
   }
 }
+
+3. what it does:-   const onlineUser = Array.from(userSocketMap.keys());
+
+4. when we use the "type":"module" in package.json then we can use the ESModule in the backend but in that case while importing and exporting files we have to use extension of the file like .js otherwise error will come.

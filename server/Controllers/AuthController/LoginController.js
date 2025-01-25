@@ -17,7 +17,7 @@ exports. LoginController = async (req, resp) => {
         if(!user){
             return resp.status(404).json({error:'user not found'})
         }
-        const isMatching = await bcryptjs.compare(password,user.password);
+        const isMatching = bcryptjs.compare(password,user.password);
         if(!isMatching){
             return resp.status(400).json({error:'password is incorrect'})
         }

@@ -25,6 +25,9 @@ const UserScema = new mongoose.Schema({
     bio: {
         type: String,
         default: ''
+    },
+    lastSeen: {
+        type: Date,
     }
 }, {
     timestamps: true
@@ -32,7 +35,7 @@ const UserScema = new mongoose.Schema({
 
 UserScema.pre('save', async function (next){
     //we will have a feature in which user can update its informations like profile pic,bio etc in those cases it will get again saved
-    //if here we dont checj that the incoming data is mofified or not then the hashed password will hashed again and will result to unwanted behaviour
+    //if here we dont check that the incoming data is mofified or not then the hashed password will hashed again and will result to unwanted behaviour
     //for this we have a method called:isModified('field we want to check if that got modified or not')
 
     if (!this.isModified('password')) {

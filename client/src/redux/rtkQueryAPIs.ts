@@ -203,7 +203,7 @@ export const api = createApi({
     }),
 
     getMessages:builder.query({
-      query:(id,page=1) => ({
+      query:({ id, page }) => ({
         url: `messages/${id}?page=${page}`,
         headers: {
           "content-Type": "application/json",
@@ -212,6 +212,30 @@ export const api = createApi({
       
       })
     }),
+
+    getUnreadMessages:builder.query({
+      query:() => ({
+        url: `chat/getunreadmessages`,
+        headers: {
+          "content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      
+      })
+    }),
+
+    sendAttachments:builder.mutation({
+      query:(formData) => ({
+        url:"/message",
+        method:'POST',
+        body:formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      
+      })
+    })
+
   })
 });
 
@@ -232,5 +256,7 @@ export const {
   useDeleteGroupMutation,
   useRenameGroupMutation,
   useLazyChatDetailsQuery,
-  useLazyGetMessagesQuery
+  useLazyGetMessagesQuery,
+  useLazyGetUnreadMessagesQuery,
+  useSendAttachmentsMutation
 } = api;

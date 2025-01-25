@@ -73,7 +73,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black w-screen overflow-hidden ">
       {/* Nav Bar */}
       <nav className="sticky top-0 z-50 border-b border-gray-200 dark:border-zinc-800 bg-white/50 dark:bg-black/50 backdrop-blur-xl">
         <div className="flex h-16 items-center justify-between px-4">
@@ -105,7 +105,7 @@ const AdminLogin = () => {
       </nav>
 
       {/* Login Form */}
-      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+      <div className="flex items-center justify-center h-[calc(100vh-4rem)] ">
         <div className="w-full max-w-md space-y-8 px-4">
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-gray-100">

@@ -6,7 +6,7 @@ export interface ChatitemProps {
     _id?: string
     lastMessage?: string,
     groupChat?: boolean,
-    sameSender?: boolean,
+    chatSelected?: boolean,
     isOnline?: boolean,
     newMessageAlert?: {
         chatId: string,
@@ -80,6 +80,11 @@ interface Attachment {
   interface MessageAlert {
     chatId:string;
     count:number;
+  }
+
+  interface Attachment {
+    file: File;
+    type: "image" | "video" | "raw" | "document";
   }
   
   export type { Message, Attachment, MessageSender,ChatDetails,MessageAlert };

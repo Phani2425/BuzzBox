@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Outlet, useLocation, useNavigate, Link } from "react-router-dom";
 import { Menu, Moon, Sun } from "lucide-react";
 
@@ -32,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/components/ui/theme-provider";
+import { useState } from "react";
 
 const iconMap = {
   Gauge,
