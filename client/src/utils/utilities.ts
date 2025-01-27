@@ -25,7 +25,7 @@ const FindFileType = (url = "") => {
     Extension === "ogg" ||
     Extension === "flac"
   ) {
-    return "audio";
+    return "raw";
   } else {
     return "file";
   }

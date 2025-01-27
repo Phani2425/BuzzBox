@@ -21,8 +21,10 @@ const ChatList: React.FC<chatList> = ({
   return (
     <div className={`w-[${w}] flex flex-col`}>
       {chats.map((chat, index) => {
+       
         // first we will destructure thr data from the chat object
-        const { avatar, _id, name, groupChat, members } = chat;
+        const { grpAvatar, _id, name, groupChat, members } = chat;
+        
         const newMessageAlert = newMessagesAlert.find(
           (alert) => alert.chatId === _id
         );
@@ -35,7 +37,7 @@ const ChatList: React.FC<chatList> = ({
           <Chatitem
             newMessageAlert={newMessageAlert}
             isOnline={isOnline}
-            avatar={avatar}
+            grpAvatar={grpAvatar}
             name={name}
             groupChat={groupChat}
             _id={_id}

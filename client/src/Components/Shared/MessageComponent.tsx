@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FindFileType } from "../../utils/utilities";
 import { transformImage } from "../../utils/utilities";
 import { File, FileCode, FileSpreadsheet, FileText } from "lucide-react";
+import moment from "moment";
 
 const MessageComponent = ({ msg, loggedUser }) => {
   return (
@@ -11,27 +12,29 @@ const MessageComponent = ({ msg, loggedUser }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`flex ${
+        className={`flex gap-3 items-start ${
           msg.sender._id === loggedUser._id ? "justify-end" : "justify-start"
         }`}
       >
-        <div
-          className={`max-w-[80%] md:max-w-[60%] p-3 rounded-lg ${
-            msg.sender._id === loggedUser._id
-              ? "bg-green-500 dark:bg-[#00A3FF] text-white"
-              : "bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-gray-200"
-          } shadow-md backdrop-blur-sm`}
-        >
+
+        <div className={`space-y-2 ${
+          msg.sender._id === loggedUser._id ? "max-w-[60%]" : "max-w-[70%]"
+        }`}>
           {msg.sender._id !== loggedUser._id && (
-            <p className="text-xs mb-1 dark:text-green-500 text-blue-600">
+            <p className="text-xs px-1 dark:text-green-500 text-blue-600">
               {msg.sender.userName}
             </p>
           )}
-          {msg.content && <p className="text-sm md:text-base">{msg.content}</p>}
 
-          {msg.attachments && msg.attachments.length > 0 && (
+          <div className={`p-3 rounded-lg break-words ${
+            msg.sender._id === loggedUser._id
+              ? "bg-green-500 dark:bg-[#00A3FF] text-white"
+              : "bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-gray-200"
+          } shadow-md backdrop-blur-sm`}>
+            {msg.content}
+            {msg.attachments && msg.attachments.length > 0 && (
             <div className="mt-2 space-y-2">
-              {msg.attachments.map((attachment, index) => {
+              {msg.attachments.map((attachment, index:number) => {
                 //finding out the type of the file and displaying it accordingly
                 const fileType = FindFileType(attachment.url);
 
@@ -118,12 +121,12 @@ const MessageComponent = ({ msg, loggedUser }) => {
               })}
             </div>
           )}
+          </div>
 
-          <p className="text-[10px] md:text-xs mt-1 opacity-70">
-            {new Date(msg.createdAt).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+          <p className={`text-xs text-gray-500 dark:text-gray-400 ${
+            msg.sender._id === loggedUser._id ? "text-right mr-2" : "ml-2"
+          }`}>
+            {moment(msg.createdAt).fromNow()}
           </p>
         </div>
       </motion.div>

@@ -18,7 +18,7 @@ import {
   NEW_MESSAGE,
   START_TYPING,
   STOP_TYPING,
-  NEW_ATTACHMENT
+  NEW_ATTACHMENT,
 } from "@/constants/events";
 import { useParams } from "react-router-dom";
 import {
@@ -136,8 +136,7 @@ const Chat = () => {
     loadingPreviousMessages.current = page > 1;
     try {
       await getMessages({ id, page }).then((res) => {
-        
-          setMessages(res.data.messages);
+        setMessages(res.data.messages);
         totalPages = res.data.totalPagesPossible;
         console.log("totalpages", totalPages);
       });
@@ -249,26 +248,26 @@ const Chat = () => {
         userName: string;
       };
       attachments: Array<{
-      resource_type: string;
-      public_id: string;
-      url: string;
-    }>;
+        resource_type: string;
+        public_id: string;
+        url: string;
+      }>;
       chatId: string;
     };
     chatId: string;
   }) => {
     if (data.chatId !== id) return;
-    
+
     const newMessage = {
       _id: Math.random().toString(), // temporary ID for real-time message
       sender: data.message.sender,
       attachments: data.message.attachments,
       content: "",
       chat: data.chatId,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
-    
-    setMessages(prev => [...prev, newMessage]);
+
+    setMessages((prev) => [...prev, newMessage]);
     containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
   };
 
@@ -278,7 +277,7 @@ const Chat = () => {
     [CONNECT_ERROR]: ConnectErrorEventHandler,
     [START_TYPING]: StartTypingEventHandler,
     [STOP_TYPING]: StopTypingEventHandler,
-    [NEW_ATTACHMENT]: NewAttachmentEventHandler
+    [NEW_ATTACHMENT]: NewAttachmentEventHandler,
   };
 
   useSocketEvent(socket, EventToHandlerMappingObject);
@@ -319,7 +318,43 @@ const Chat = () => {
         // onScroll={handleScroll}
         className="absolute top-0 left-0 right-0 bottom-[4.4rem] overflow-y-auto scrollbar-hide px-4 py-4 space-y-4 rounded-b-2xl"
       >
-        {MessageLoading && <div>Messages Loading</div>}
+        {MessageLoading && (
+  <>
+    {[1, 2, 3,4,5,6].map((_, i) => (
+      <div 
+        key={i} 
+        className={`flex gap-3 items-start ${i % 2 === 0 ? '' : 'justify-end'}`}
+      >
+        {/* Left side messages have avatar */}
+        {i % 2 === 0 && (
+          <div className="w-10 h-10 shrink-0 rounded-full bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+        )}
+        
+        <div className={`space-y-2 ${i % 2 === 0 ? 'max-w-[70%]' : 'max-w-[60%]'}`}>
+          {/* Name only for left messages */}
+          {i % 2 === 0 && (
+            <div className="w-32 h-4 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse" />
+          )}
+          
+          {/* Message bubble */}
+          <div className={`space-y-2 p-3 rounded-lg ${
+            i % 2 === 0 
+              ? 'bg-gray-200 dark:bg-zinc-700' 
+              : 'bg-blue-500/20 dark:bg-blue-500/30'
+          }`}>
+            <div className="w-full h-4 bg-gray-300 dark:bg-zinc-600 rounded animate-pulse" />
+            <div className="w-4/5 h-4 bg-gray-300 dark:bg-zinc-600 rounded animate-pulse" />
+          </div>
+
+          {/* Time */}
+          <div className={`w-20 h-3 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse ${
+            i % 2 === 0 ? 'ml-2' : 'ml-auto mr-2'
+          }`} />
+        </div>
+      </div>
+    ))}
+  </>
+)}
         {messages &&
           messages.length > 0 &&
           messages.map((msg, i: number) => (
@@ -360,7 +395,7 @@ const Chat = () => {
           />
           <input
             type="file"
-            onChange={(e) => handleFileSelect(e, "audio")}
+            onChange={(e) => handleFileSelect(e, "raw")}
             className="hidden"
             ref={audioInputRef}
             accept="audio/*"

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChatitemProps } from "@/Types/types";
 import AvatarCard from "./AvatarCard";
@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import GroupAvatar from "./GroupAvatar";
 
 const Chatitem: React.FC<ChatitemProps> = ({
-  avatar = [],
+  grpAvatar = [],
   name,
   _id,
   lastMessage,
@@ -43,10 +43,10 @@ const Chatitem: React.FC<ChatitemProps> = ({
           "relative"
         )}
       >
-        {avatar.length > 0 ? (
-          <GroupAvatar avatars={avatar} />
+        {grpAvatar.length > 0 ? (
+          <GroupAvatar avatars={grpAvatar} />
         ) : (
-          <AvatarCard avatar={avatar} />
+          <AvatarCard avatar={grpAvatar} />
         )}
 
         <div className="flex flex-col">

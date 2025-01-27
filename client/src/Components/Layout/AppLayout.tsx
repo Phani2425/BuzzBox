@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import ChatList from "../Specific/ChatList";
 import { useParams } from "react-router-dom";
@@ -9,9 +9,11 @@ import { useLazyGetUnreadMessagesQuery, useMyChatsQuery } from "@/redux/rtkQuery
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { getSocket } from "@/Socket";
-import { NEW_MESSAGE_ALERT, ONLINE_USERS } from "@/constants/events";
+import { NEW_MESSAGE_ALERT, NEW_REQUEST, ONLINE_USERS } from "@/constants/events";
 import { useSocketEvent } from "@/hooks/utilityHooks";
 import { MessageAlert } from "@/Types/types";
+import { useDispatch } from "react-redux";
+import { incrementNotificationCount } from "@/redux/slices/chatSlice";
 
 type WrappedComponentProps = {
   [key: string]: any; // Use appropriate type for your props
@@ -37,6 +39,8 @@ const AppLayout =
       const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
       const [getUnreadMessages] = useLazyGetUnreadMessagesQuery();
+
+      const dispatch = useDispatch();
 
       const fetchUnreadMessages = async() => {
         try{
@@ -139,9 +143,14 @@ const AppLayout =
         setOnlineUsers(onlineUsers);
       };
 
+      const newRequestHandler= useCallback(() => {
+        dispatch(incrementNotificationCount());
+      },[])
+
       const EventToHandlerMappingObject = {
         [NEW_MESSAGE_ALERT]: NewMessageAlertEventHandler,
         [ONLINE_USERS]: onlineUserhandler,
+        [NEW_REQUEST]: newRequestHandler,
       };
 
       useSocketEvent(socket, EventToHandlerMappingObject);
@@ -178,6 +187,7 @@ const AppLayout =
                 {isError && <div>{`Error fethcing the chats:- ${error}`}</div>}
                 {isLoading ? (
                   <div className="flex flex-col gap-2 w-full px-1">
+                  
                     {new Array(15).fill(0).map((_, i) => {
                       return (
                         <Skeleton key={i} className="w-full h-16 rounded-xl" />

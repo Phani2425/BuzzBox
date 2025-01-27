@@ -44,6 +44,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { api } from "@/redux/rtkQueryAPIs";
+import { resetNotificationCount } from "@/redux/slices/chatSlice";
 
 const Searchcomp = lazy(() => import("../Navbar/Search"));
 const NewGroup = lazy(() => import("../Navbar/Newgroup"));
@@ -56,6 +57,7 @@ interface props {
 
 const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const { notificationCount } = useSelector((state: RootState) => state.chat);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -74,6 +76,7 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
     setisNewGroup((prev) => !prev);
   };
   const notificationhandler = () => {
+    dispatch(resetNotificationCount());
     setisNotification((prev) => !prev);
   };
 
@@ -193,6 +196,13 @@ const Navbar: React.FC<props> = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
                   onClick={notificationhandler}
                 >
                   <BellDotIcon />
+                  {notificationCount > 0 && (
+                    <div className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center">
+                      <span className="text-[10px] font-medium text-white">
+                        {notificationCount > 99 ? "99+" : notificationCount}
+                      </span>
+                    </div>
+                  )}
                   <span className="sr-only">Notification</span>
                 </Button>
               </TooltipTrigger>

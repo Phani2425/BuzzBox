@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 export interface ChatitemProps {
-    avatar?: string[]
+    grpAvatar?: string[]
     name?: string
     _id?: string
     lastMessage?: string,

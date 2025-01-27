@@ -128,7 +128,7 @@ const Groups = () => {
   const isGroupAdmin = selectedGroupDetails?.creator === user._id;
 
   return (
-    <div className="h-screen bg-white dark:bg-black">
+    <div className="h-screen w-screen bg-white dark:bg-black">
       {/* Mobile View */}
       <div className="md:hidden flex flex-col h-full">
         <div className="p-4 border-b border-gray-200 dark:border-zinc-800">

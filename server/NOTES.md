@@ -79,3 +79,18 @@ exports. socketAuthenticator = async (err,socket,next) => {
 3. what it does:-   const onlineUser = Array.from(userSocketMap.keys());
 
 4. when we use the "type":"module" in package.json then we can use the ESModule in the backend but in that case while importing and exporting files we have to use extension of the file like .js otherwise error will come.
+
+5. when you need to access the "io" object in other files in the backend, which is created in the index.js file by syntax {new Server(server created by http server,cors config)} then what you need to do is:- 
+
+the server you created using express() just set the value of 'io' with a key likee:- 
+app.set('io',io);
+
+then anywhere in the backeend you can access it like:- 
+req.app.get('io');
+
+6. Express provides an application-wide storage mechanism through:
+app.set('io', io);    // Store the io instance
+req.app.get('io'); 
+This works because:
+Every request (req) has access to the app instance via req.app
+The Express app object acts like a secure container for sharing application-level data
