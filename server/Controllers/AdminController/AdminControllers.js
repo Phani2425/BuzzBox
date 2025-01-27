@@ -9,6 +9,7 @@ const Request = require('../../Models/Requests');
 const Message = require('../../Models/Message');
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
+const { default: mongoose } = require('mongoose');
 require('dotenv').config();
 
 //controller for admin to login into the admin panel
@@ -194,7 +195,15 @@ const getAllMessages = async (req, resp) => {
 const getChatMessages = async (req, resp) => {
     try {
 
-        const chatId = req.params.id;
+        if (!req.params.id || !mongoose.isValidObjectId(req.params.id)) {
+            return resp.status(400).json({
+                success: false,
+                message: 'Invalid chat ID format'
+            });
+        }
+
+
+        const chatId = new mongoose.Types.ObjectId(req.params.id);
         const messages = await Message.find({ chat:chatId }).populate('sender', 'userName profilePic').sort({ createdAt: 1 }).lean();
 
         const transformedMessages = messages.map(message => {
@@ -217,10 +226,10 @@ const getChatMessages = async (req, resp) => {
         });
 
     } catch (err) {
-        console.log('Error occurred while fetching all messages', err.message);
+        console.log('Error occurred while fetching chat messages', err.message);
         return resp.status(500).json({
             success: false,
-            message: 'Error occurred while fetching all messages'
+            message: 'Error occurred while fetching chat messages'
         });
     }
 }

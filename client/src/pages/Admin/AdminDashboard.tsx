@@ -153,20 +153,22 @@ export default function AdminDashboard() {
         transition={{ delay: 0.5 }}
         className="mt-8"
       >
-        <Card className="p-6 bg-white/10 dark:bg-black/10 backdrop-blur-lg">
-          <h3 className="text-lg font-semibold mb-6">Weekly Activity</h3>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData}>
+        <Card className="p-4 md:p-6 bg-white/10 dark:bg-black/10 backdrop-blur-lg">
+          <h3 className="text-lg font-semibold mb-4">Weekly Activity</h3>
+          <div className="w-full h-[300px] md:h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}  margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="Users" stroke="#3b82f6" />
-              <Line type="monotone" dataKey="Chats" stroke="#22c55e" />
-              <Line type="monotone" dataKey="Messages" stroke="#a855f7" />
+              <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }} />
+              <Line type="monotone" dataKey="Users" stroke="#3b82f6" strokeWidth={2} />
+              <Line type="monotone" dataKey="Chats" stroke="#22c55e" strokeWidth={2}/>
+              <Line type="monotone" dataKey="Messages" stroke="#a855f7" strokeWidth={2}/>
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </Card>
       </motion.div>
       </div>

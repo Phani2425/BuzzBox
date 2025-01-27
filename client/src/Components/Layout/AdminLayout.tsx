@@ -197,8 +197,8 @@ const AdminSidebar = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="hidden md:flex md:col-span-1 md:flex-col h-full bg-white dark:bg-black border-r border-gray-200 dark:border-zinc-800">
-      <div className="flex flex-col flex-grow pt-5 overflow-y-auto scrollbar-hide">
+    <div className="hidden md:flex md:col-span-1 md:flex-col h-screen bg-white dark:bg-black border-r border-gray-200 dark:border-zinc-800">
+      <div className="flex flex-col flex-grow pt-5 scrollbar-hide ">
         <nav className="flex-1 px-2 space-y-1">
           {AdminNavBarTabs.map((item) => {
             const Icon = iconMap[item.iconName];
