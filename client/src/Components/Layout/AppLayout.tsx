@@ -5,11 +5,18 @@ import Navbar from "./Navbar";
 import ChatList from "../Specific/ChatList";
 import { useParams } from "react-router-dom";
 import Profile from "../Specific/Profile";
-import { useLazyGetUnreadMessagesQuery, useMyChatsQuery } from "@/redux/rtkQueryAPIs";
+import {
+  useLazyGetUnreadMessagesQuery,
+  useMyChatsQuery,
+} from "@/redux/rtkQueryAPIs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { getSocket } from "@/Socket";
-import { NEW_MESSAGE_ALERT, NEW_REQUEST, ONLINE_USERS } from "@/constants/events";
+import {
+  NEW_MESSAGE_ALERT,
+  NEW_REQUEST,
+  ONLINE_USERS,
+} from "@/constants/events";
 import { useSocketEvent } from "@/hooks/utilityHooks";
 import { MessageAlert } from "@/Types/types";
 import { useDispatch } from "react-redux";
@@ -42,37 +49,34 @@ const AppLayout =
 
       const dispatch = useDispatch();
 
-      const fetchUnreadMessages = async() => {
-        try{
-
+      const fetchUnreadMessages = async () => {
+        try {
           await getUnreadMessages().then((res) => {
-            console.log('unread messages:- ',res.data.result);
+            console.log("unread messages:- ", res.data.result);
             setNewMessageAlerts(res.data.result);
-          })
-
-        }catch(err){
-          if(err instanceof Error){
+          });
+        } catch (err) {
+          if (err instanceof Error) {
             console.log("Error fetching the unread messages", err);
             toast({
               variant: "destructive",
               title: "Error",
               description: `Error fetching the unread messages:- ${err.message}`,
             });
-            
+          } else {
+            console.log("Error fetching the unread messages", err);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: `Error fetching the unread messages:- ${err}`,
+            });
+          }
         }
-        else{
-          console.log("Error fetching the unread messages", err);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: `Error fetching the unread messages:- ${err}`,
-          });
-        }
-      }}
+      };
 
       useEffect(() => {
-         fetchUnreadMessages();
-      },[])
+        fetchUnreadMessages();
+      }, []);
 
       useEffect(() => {
         if (isError) {
@@ -96,7 +100,7 @@ const AppLayout =
           );
           setNewMessageAlerts(updatedAlerts);
         }
-      }, [CurrentchatId,newMessaegAlerts]);
+      }, [CurrentchatId, newMessaegAlerts]);
 
       const handledeleteChat = (
         e: React.MouseEvent<HTMLDivElement>,
@@ -143,9 +147,9 @@ const AppLayout =
         setOnlineUsers(onlineUsers);
       };
 
-      const newRequestHandler= useCallback(() => {
+      const newRequestHandler = useCallback(() => {
         dispatch(incrementNotificationCount());
-      },[])
+      }, []);
 
       const EventToHandlerMappingObject = {
         [NEW_MESSAGE_ALERT]: NewMessageAlertEventHandler,
@@ -186,13 +190,28 @@ const AppLayout =
               >
                 {isError && <div>{`Error fethcing the chats:- ${error}`}</div>}
                 {isLoading ? (
-                  <div className="flex flex-col gap-2 w-full px-1">
-                  
-                    {new Array(15).fill(0).map((_, i) => {
-                      return (
-                        <Skeleton key={i} className="w-full h-16 rounded-xl" />
-                      );
-                    })}
+                  <div className="flex flex-col gap-3 w-full p-2">
+                    {new Array(8).fill(0).map((_, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-zinc-800/50"
+                      >
+                        {/* Avatar Skeleton */}
+                        <Skeleton className="w-12 h-12 rounded-full shrink-0" />
+
+                        <div className="flex-1 space-y-2">
+                          {/* Name Skeleton */}
+                          <Skeleton className="w-32 h-4" />
+
+                          {/* Message Preview Skeleton */}
+                          <div className="flex items-center justify-between">
+                            <Skeleton className="w-48 h-3" />
+                            {/* Time Skeleton */}
+                            <Skeleton className="w-10 h-3" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <ChatList

@@ -234,8 +234,60 @@ export const api = createApi({
         }
       
       })
-    })
+    }),
 
+
+    getAllUsers: builder.query({
+      query: () => ({
+        url: '/admin/getusers',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }),
+
+    getAllChats: builder.query({
+      query: () => ({
+        url: '/admin/getchats',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }),
+
+    getChatMessages: builder.query({
+      query: () => ({
+        url: `/admin/getmessages`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }),
+
+    getSingleChatMessages: builder.query({
+      query: (chatId) => ({
+        url: `/admin/getchatmessages/${chatId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }),
+
+
+    getStats: builder.query({
+      query: (week = 0) => ({
+        url: `/admin/getstats?week=${week}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }),
+    
   })
 });
 
@@ -258,5 +310,10 @@ export const {
   useLazyChatDetailsQuery,
   useLazyGetMessagesQuery,
   useLazyGetUnreadMessagesQuery,
-  useSendAttachmentsMutation
+  useSendAttachmentsMutation,
+  useGetAllUsersQuery,
+  useGetAllChatsQuery,
+  useGetChatMessagesQuery,
+  useGetStatsQuery,
+  useGetSingleChatMessagesQuery
 } = api;

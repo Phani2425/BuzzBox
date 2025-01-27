@@ -38,6 +38,7 @@ import {
 } from "@/redux/rtkQueryAPIs";
 import GroupAvatar from "@/Components/Shared/GroupAvatar";
 import Newgroup from "@/Components/Navbar/Newgroup";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface groupinterface {
   _id: string;
@@ -111,8 +112,38 @@ const Groups = () => {
   }, [showNewGroupModal]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
-  }
+    return (
+      <div className="container mx-auto p-4 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((_, i) => (
+            <div
+              key={i}
+              className="p-4 rounded-xl bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm border border-gray-100 dark:border-zinc-700/50"
+            >
+              {/* Group Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <Skeleton className="h-12 w-12 rounded-full shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+  
+              {/* Group Members */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3].map((_, j) => (
+                    <Skeleton key={j} className="h-8 w-8 rounded-full" />
+                  ))}
+                </div>
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-4/5" />
+              </div>
+            </div> ))}
+      </div>
+    </div>
+  );
+}
 
   if (isError) {
     toast({
@@ -302,7 +333,7 @@ const GroupDetails = ({
 }: {
   group: groupinterface;
   isAdmin: boolean;
-  refetch?: () => QueryActionCreatorResult<any> ;
+  refetch: () => QueryActionCreatorResult<any> ;
 }) => {
   const [leaveGroup] = useLeaveGroupMutation();
   const [removeMember] = useRemoveMembersMutation();
@@ -391,7 +422,7 @@ const GroupDetails = ({
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
               {group.name}
             </h2>
-            <p className="text-gray-500">Created on April 1, 2024</p>
+           
           </div>
         </div>
         <DropdownMenu>
@@ -693,8 +724,10 @@ const AddMemberModal = ({ onClose,refetch,group } :{
 
   const fetchFriends = async () => {
     await getMyFriends().then((res) => { 
-     setusers(res.data.users);
-     setUsersShown(res.data.users);
+      const resultUser = res.data.users;
+      const userExceptMembers = resultUser.filter((user) => group.members.every((member) => member._id !== user._id));
+     setusers(userExceptMembers);
+     setUsersShown(userExceptMembers);
     } )
   }
 

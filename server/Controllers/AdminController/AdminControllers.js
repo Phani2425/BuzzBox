@@ -110,7 +110,7 @@ const getAllUsers = async (req, resp) => {
 const getAllChats = async (req, resp) => {
     try {
 
-        const chats = await Chat.find({}).populate('members', 'userName profilePic').populate('creator', 'userName profilePic').lean();
+        const chats = await Chat.find({groupChat:true}).populate('members', 'userName profilePic').populate('creator', 'userName profilePic').lean();
 
         //i will transform each chat object befor sending that
         const transformedChats = await Promise.all(chats.map(async (chat, index) => {
@@ -160,8 +160,42 @@ const getAllChats = async (req, resp) => {
 const getAllMessages = async (req, resp) => {
     try {
 
+        
+        const messages = await Message.find({}).populate('sender', 'userName profilePic').sort({ createdAt: 1 }).lean();
+
+        const transformedMessages = messages.map(message => {
+            return {
+                _id: message._id,
+                sender: {
+                    id: message.sender._id,
+                    userName: message.sender.userName,
+                    profilePic: message.sender.profilePic
+                },
+                content: message.content,
+                attachments: message.attachments,
+                createdAt: message.createdAt.toLocaleDateString() + ' ' + message.createdAt.toLocaleTimeString()
+            };
+        });
+
+        return resp.status(200).json({
+            success: true,
+            messages: transformedMessages
+        });
+
+    } catch (err) {
+        console.log('Error occurred while fetching all messages', err.message);
+        return resp.status(500).json({
+            success: false,
+            message: 'Error occurred while fetching all messages'
+        });
+    }
+}
+
+const getChatMessages = async (req, resp) => {
+    try {
+
         const chatId = req.params.id;
-        const messages = await Message.find({ chat: chatId }).populate('sender', 'userName profilePic').sort({ createdAt: 1 }).lean();
+        const messages = await Message.find({ chat:chatId }).populate('sender', 'userName profilePic').sort({ createdAt: 1 }).lean();
 
         const transformedMessages = messages.map(message => {
             return {
@@ -277,4 +311,4 @@ const getStats = async (req, resp) => {
     }
 }
 
-module.exports = { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin };
+module.exports = { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin,getChatMessages };

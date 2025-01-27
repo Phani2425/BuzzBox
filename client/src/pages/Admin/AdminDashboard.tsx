@@ -1,11 +1,13 @@
+import { useGetStatsQuery } from "@/redux/rtkQueryAPIs";
 import { Card } from "@/components/ui/card";
-import { 
-  Users, 
-  MessageSquare, 
-  MessagesSquare,
-  TrendingUp 
-} from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  Users,
+  MessageSquare,
+  MessagesSquare,
+  UsersRound,
+  Loader2
+} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -13,46 +15,58 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  
+  Legend,
+  ResponsiveContainer
 } from "recharts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
-const AdminDashboard = () => {
-  // Sample data - replace with actual API data
-  const stats = {
-    userCount: 150,
-    chatCount: 45,
-    messageCount: 1250,
-    groupCount: 20,
-    userCreated: 15,
-    chatCreated: 5,
-    messageCreated: 120,
-    ArrayForUser: [2, 3, 1, 4, 2, 1, 2],
-    ArrayForChat: [1, 0, 2, 1, 0, 1, 0],
-    ArrayForMessage: [20, 15, 25, 18, 22, 10, 10]
-  };
+export default function AdminDashboard() {
+  const [selectedWeek, setSelectedWeek] = useState("0");
+  const { data: statsData, isLoading, error } = useGetStatsQuery(selectedWeek);
 
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-  const activityData = weekDays.map((day, index) => ({
+  if (error) {
+    return (
+      <div className="text-red-500 text-center p-4">
+        Failed to load dashboard stats
+      </div>
+    );
+  }
+
+  const { stats } = statsData;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const chartData = days.map((day, index) => ({
     name: day,
-    messages: stats.ArrayForMessage[index],
-    users: stats.ArrayForUser[index],
-    chats: stats.ArrayForChat[index]
+    Users: stats.ArrayForUser[index],
+    Chats: stats.ArrayForChat[index],
+    Messages: stats.ArrayForMessage[index],
   }));
 
-  const pieData = [
-    { name: "Group Chats", value: stats.groupCount },
-    { name: "Direct Messages", value: stats.chatCount - stats.groupCount }
-  ];
-
-  const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))"];
-
   return (
-    <div className="space-y-8">
+    <div className="h-screen overflow-y-auto scrollbar-hide">
+       <div className="container mx-auto p-6 space-y-8 pb-20">
+      {/* Week Selector */}
+      <div className="flex justify-end sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-2">
+        <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Week" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">Current Week</SelectItem>
+            <SelectItem value="1">Last Week</SelectItem>
+            <SelectItem value="2">Two Weeks Ago</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <motion.div
@@ -68,6 +82,7 @@ const AdminDashboard = () => {
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Users</p>
                 <h3 className="text-2xl font-bold">{stats.userCount}</h3>
+                <p className="text-xs text-green-500">+{stats.userCreated} this week</p>
               </div>
             </div>
           </Card>
@@ -86,6 +101,7 @@ const AdminDashboard = () => {
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Chats</p>
                 <h3 className="text-2xl font-bold">{stats.chatCount}</h3>
+                <p className="text-xs text-green-500">+{stats.chatCreated} this week</p>
               </div>
             </div>
           </Card>
@@ -104,6 +120,7 @@ const AdminDashboard = () => {
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Messages</p>
                 <h3 className="text-2xl font-bold">{stats.messageCount}</h3>
+                <p className="text-xs text-green-500">+{stats.messageCreated} this week</p>
               </div>
             </div>
           </Card>
@@ -117,85 +134,42 @@ const AdminDashboard = () => {
           <Card className="p-6 bg-white/10 dark:bg-black/10 backdrop-blur-lg">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-orange-500/10 rounded-full">
-                <TrendingUp className="h-6 w-6 text-orange-500" />
+                <UsersRound className="h-6 w-6 text-orange-500" />
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">New Users This Week</p>
-                <h3 className="text-2xl font-bold">{stats.userCreated}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total Groups</p>
+                <h3 className="text-2xl font-bold">{stats.groupCount}</h3>
+                <p className="text-xs text-green-500">+{stats.chatCreated} this week</p>
               </div>
             </div>
           </Card>
         </motion.div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Activity Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card className="p-6 bg-white/10 dark:bg-black/10 backdrop-blur-lg">
-            <h3 className="text-lg font-semibold mb-4">Weekly Activity</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={activityData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="messages" 
-                    stroke="hsl(var(--chart-1))" 
-                    strokeWidth={2} 
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="users" 
-                    stroke="hsl(var(--chart-2))" 
-                    strokeWidth={2} 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Chat Distribution */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Card className="p-6 bg-white/10 dark:bg-black/10 backdrop-blur-lg">
-            <h3 className="text-lg font-semibold mb-4">Chat Distribution</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </motion.div>
+      {/* Activity Chart */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="mt-8"
+      >
+        <Card className="p-6 bg-white/10 dark:bg-black/10 backdrop-blur-lg">
+          <h3 className="text-lg font-semibold mb-6">Weekly Activity</h3>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="Users" stroke="#3b82f6" />
+              <Line type="monotone" dataKey="Chats" stroke="#22c55e" />
+              <Line type="monotone" dataKey="Messages" stroke="#a855f7" />
+            </LineChart>
+          </ResponsiveContainer>
+        </Card>
+      </motion.div>
       </div>
     </div>
   );
-};
-
-export default AdminDashboard;
+}

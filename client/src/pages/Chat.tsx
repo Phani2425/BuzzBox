@@ -19,6 +19,7 @@ import {
   START_TYPING,
   STOP_TYPING,
   NEW_ATTACHMENT,
+  ALERT,
 } from "@/constants/events";
 import { useParams } from "react-router-dom";
 import {
@@ -271,6 +272,20 @@ const Chat = () => {
     containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
   };
 
+  // const AlertHandler = (content) => {
+  //   const messageForAlert = {
+  //     chat: id,
+  //     content: content,
+  //     sender: {
+  //       _id: user._id,
+  //       userName: user.userName,
+  //     },
+  //     createdAt: new Date().toISOString(),
+  //   };
+
+
+  // };
+
   //when a key in an object is an variable then that key is called dynamic key and that can be written inside the square bracket : - [DynamicKey]
   const EventToHandlerMappingObject = {
     [NEW_MESSAGE]: NewMessaegeEventHandler,
@@ -278,6 +293,7 @@ const Chat = () => {
     [START_TYPING]: StartTypingEventHandler,
     [STOP_TYPING]: StopTypingEventHandler,
     [NEW_ATTACHMENT]: NewAttachmentEventHandler,
+    // [ALERT]: AlertHandler
   };
 
   useSocketEvent(socket, EventToHandlerMappingObject);
@@ -319,42 +335,48 @@ const Chat = () => {
         className="absolute top-0 left-0 right-0 bottom-[4.4rem] overflow-y-auto scrollbar-hide px-4 py-4 space-y-4 rounded-b-2xl"
       >
         {MessageLoading && (
-  <>
-    {[1, 2, 3,4,5,6].map((_, i) => (
-      <div 
-        key={i} 
-        className={`flex gap-3 items-start ${i % 2 === 0 ? '' : 'justify-end'}`}
-      >
-        {/* Left side messages have avatar */}
-        {i % 2 === 0 && (
-          <div className="w-10 h-10 shrink-0 rounded-full bg-gray-200 dark:bg-zinc-700 animate-pulse" />
-        )}
-        
-        <div className={`space-y-2 ${i % 2 === 0 ? 'max-w-[70%]' : 'max-w-[60%]'}`}>
-          {/* Name only for left messages */}
-          {i % 2 === 0 && (
-            <div className="w-32 h-4 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse" />
-          )}
-          
-          {/* Message bubble */}
-          <div className={`space-y-2 p-3 rounded-lg ${
-            i % 2 === 0 
-              ? 'bg-gray-200 dark:bg-zinc-700' 
-              : 'bg-blue-500/20 dark:bg-blue-500/30'
-          }`}>
-            <div className="w-full h-4 bg-gray-300 dark:bg-zinc-600 rounded animate-pulse" />
-            <div className="w-4/5 h-4 bg-gray-300 dark:bg-zinc-600 rounded animate-pulse" />
-          </div>
+          <>
+            {[1, 2, 3, 4, 5, 6].map((_, i) => (
+              <div
+                key={i}
+                className={`flex gap-3 items-start ${
+                  i % 2 === 0 ? "" : "justify-end"
+                }`}
+              >
+                {i % 2 === 0 && (
+                  <div className="w-10 h-10 shrink-0 rounded-full bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+                )}
 
-          {/* Time */}
-          <div className={`w-20 h-3 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse ${
-            i % 2 === 0 ? 'ml-2' : 'ml-auto mr-2'
-          }`} />
-        </div>
-      </div>
-    ))}
-  </>
-)}
+                <div
+                  className={`space-y-2 ${
+                    i % 2 === 0 ? "max-w-[70%]" : "max-w-[60%]"
+                  }`}
+                >
+                  {i % 2 === 0 && (
+                    <div className="w-32 h-4 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse" />
+                  )}
+
+                  <div
+                    className={`space-y-2 p-3 rounded-lg ${
+                      i % 2 === 0
+                        ? "bg-gray-200 dark:bg-zinc-700"
+                        : "bg-blue-500/20 dark:bg-blue-500/30"
+                    }`}
+                  >
+                    <div className="w-full h-4 bg-gray-300 dark:bg-zinc-600 rounded animate-pulse" />
+                    <div className="w-4/5 h-4 bg-gray-300 dark:bg-zinc-600 rounded animate-pulse" />
+                  </div>
+
+                  <div
+                    className={`w-20 h-3 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse ${
+                      i % 2 === 0 ? "ml-2" : "ml-auto mr-2"
+                    }`}
+                  />
+                </div>
+              </div>
+            ))}
+          </>
+        )}
         {messages &&
           messages.length > 0 &&
           messages.map((msg, i: number) => (
@@ -363,14 +385,33 @@ const Chat = () => {
 
         {isTyping && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="flex items-center gap-2 py-3 mt-4 p-2 bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 rounded-lg w-fit"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{
+              duration: 0.2,
+              ease: [0.4, 0.0, 0.2, 1],
+            }}
+            className="flex items-center gap-3 py-2.5 px-5 mt-4 
+      bg-gradient-to-r from-white/90 to-gray-50/90
+      dark:from-zinc-900/90 dark:to-zinc-800/90
+      backdrop-blur-md rounded-2xl w-fit
+      shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]
+      dark:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.3)]
+      border border-gray-200/30 dark:border-white/[0.08]
+      ring-1 ring-black/[0.03] dark:ring-white/[0.03]"
           >
             <BouncingDotsLoader />
-            <span className="ml-2 text-gray-600 dark:text-gray-300">
-              {typingUser} is typing...
+            <span
+              className="text-[13px] font-medium 
+      bg-gradient-to-r 
+      from-gray-800 via-gray-600 to-gray-700
+      dark:from-gray-100 dark:via-gray-300 dark:to-gray-200
+      bg-clip-text text-transparent
+      tracking-tight"
+            >
+              {typingUser} is typing
+              <span className="opacity-60">...</span>
             </span>
           </motion.div>
         )}

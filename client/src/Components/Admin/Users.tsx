@@ -1,131 +1,94 @@
-import React, { useMemo } from 'react';
-import { useTable } from 'react-table';
-import { User } from '@/Types/types';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { useState } from "react";
+import { useGetAllUsersQuery } from "@/redux/rtkQueryAPIs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Search, Loader2, Users, Boxes } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
-const sampleUsers: User[] = [
-  {
-    id: '1',
-    profilePic: 'https://ui-avatars.com/api/?name=John+Doe',
-    userName: 'johndoe',
-    name: 'John Doe',
-    friendsCount: 10,
-    groupsCount: 5,
-    createdAt: '2023-01-01T10:00:00.000Z',
-  },
-  {
-    id: '2',
-    profilePic: 'https://ui-avatars.com/api/?name=Jane+Smith',
-    userName: 'janesmith',
-    name: 'Jane Smith',
-    friendsCount: 8,
-    groupsCount: 3,
-    createdAt: '2023-02-15T10:00:00.000Z',
-  },
-  {
-    id: '3',
-    profilePic: 'https://ui-avatars.com/api/?name=Bob+Johnson',
-    userName: 'bobjohnson',
-    name: 'Bob Johnson',
-    friendsCount: 15,
-    groupsCount: 7,
-    createdAt: '2023-03-20T10:00:00.000Z',
-  },
-  // Add more sample users as needed
-];
+const UsersPage = () => {
+  const { data, isLoading } = useGetAllUsersQuery();
+  const [search, setSearch] = useState("");
 
-const Users = () => {
-  const data = useMemo(() => sampleUsers, []);
-
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'Avatar',
-        accessor: 'profilePic',
-        Cell: ({ value }: { value: string }) => (
-          <Avatar className="w-10 h-10">
-            <AvatarImage src={value} alt="Avatar" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-        ),
-      },
-      {
-        Header: 'Username',
-        accessor: 'userName',
-      },
-      {
-        Header: 'Name',
-        accessor: 'name',
-      },
-      {
-        Header: 'Friends',
-        accessor: 'friendsCount',
-      },
-      {
-        Header: 'Groups',
-        accessor: 'groupsCount',
-      },
-      {
-        Header: 'Date Joined',
-        accessor: 'createdAt',
-        Cell: ({ value }: { value: string }) => new Date(value).toLocaleDateString(),
-      },
-    ],
-    []
+  const filteredUsers = data?.users.filter((user) =>
+    user.userName.toLowerCase().includes(search.toLowerCase()) ||
+    user.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
-    columns,
-    data,
-  });
-
   return (
-    <div className="p-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table {...getTableProps()} className="min-w-full bg-transparent">
-              <thead>
-                {headerGroups.map((headerGroup) => (
-                  <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
-                    {headerGroup.headers.map((column) => (
-                      <th
-                        {...column.getHeaderProps()}
-                        className="px-4 py-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        {column.render('Header')}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
-                {rows.map((row) => {
-                  prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()} className="border-b">
-                      {row.cells.map((cell) => (
-                        <td
-                          {...cell.getCellProps()}
-                          className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300"
-                        >
-                          {cell.render('Cell')}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="p-6 space-y-6 overflow-y-auto h-screen scrollbar-hide">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">All Users</h2>
+        <div className="relative w-64">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search users..."
+            className="pl-8"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Users Table */}
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Friends</TableHead>
+                <TableHead>Groups</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers?.map((user) => (
+                <TableRow key={user.email}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={user.profilePic} />
+                        <AvatarFallback>
+                          {user.userName.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{user.userName}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span>{user.friendsCount}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Boxes className="h-4 w-4 text-muted-foreground" />
+                      <span>{user.groupsCount}</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
     </div>
   );
 };
 
-export default Users;
+export default UsersPage;

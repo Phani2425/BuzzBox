@@ -1,5 +1,5 @@
 const {uploadProfileInstance,uploadAttachments} = require('../Config/multerConfig');
-const { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin } = require('../Controllers/AdminController/AdminControllers');
+const { getAllUsers, getAllChats, getAllMessages, getStats, AdminLogin, getChatMessages } = require('../Controllers/AdminController/AdminControllers');
 const { LoginController } = require('../Controllers/AuthController/LoginController');
 const { SignupController, oauthSignup, setUserName } = require('../Controllers/AuthController/SignupController');
 const { FindUniqueUserName } = require('../Controllers/AuthController/UsernameController');
@@ -59,9 +59,10 @@ router.get('/messages/:id',isAuthenticated,getMessages);
 
 //router for admin controllers
 router.post('/admin/login',AdminLogin);
-router.get('/admin/getusers',isAdminAuthenticated,getAllUsers);
-router.get('/admin/getchats',isAdminAuthenticated,getAllChats);
-router.get('/admin/getmessages/:id',isAdminAuthenticated,getAllMessages);
-router.get('/admin/getstats',isAdminAuthenticated,getStats);
+router.get('/admin/getusers',getAllUsers);
+router.get('/admin/getchats',getAllChats);
+router.get('/admin/getmessages',getAllMessages);
+router.get('/admin/getstats',getStats);
+router.get('/admin/getchatmessages/:id',getChatMessages);
 
 module.exports = router;
