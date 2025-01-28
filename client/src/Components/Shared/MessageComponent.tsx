@@ -1,4 +1,4 @@
-import React from "react";
+
 import { motion } from "framer-motion";
 import { FindFileType } from "../../utils/utilities";
 import { transformImage } from "../../utils/utilities";

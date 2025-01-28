@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import FilePreviewCard from "@/Components/chat/FilePreviewCard";
 
-const Chat = () => {
+const Chat: React.FC  = () => {
   const { id } = useParams();
   const containerRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -557,4 +557,8 @@ const Chat = () => {
   );
 };
 
-export default AppLayout()(Chat);
+export default () => (
+  <AppLayout>
+    <Chat />
+  </AppLayout>
+);

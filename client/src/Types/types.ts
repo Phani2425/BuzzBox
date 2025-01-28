@@ -19,7 +19,7 @@ export interface ChatitemProps {
     groupChat: boolean
   ) => void;
   members?: string[];
-  setIsMobileMenuOpen: Dispatch<SetStateAction<boolean>>;
+  setIsMobileMenuOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface chatList {
@@ -36,7 +36,7 @@ export interface chatList {
     _id: string,
     groupChat: boolean
   ) => void;
-  setIsMobileMenuOpen: Dispatch<SetStateAction<boolean>>;
+  setIsMobileMenuOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface User {

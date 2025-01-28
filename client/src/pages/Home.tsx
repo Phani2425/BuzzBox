@@ -2,7 +2,7 @@ import AppLayout from "@/Components/Layout/AppLayout";
 import { MessageSquare, UserPlus, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
-const Home = () => {
+const Home:React.FC = () => {
 
 
   const features = [
@@ -87,4 +87,8 @@ const Home = () => {
   );
 };
 
-export default AppLayout()(Home);
+export default () => (
+  <AppLayout>
+    <Home />
+  </AppLayout>
+);

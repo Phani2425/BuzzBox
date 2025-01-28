@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, FC, ReactNode } from "react";
 import Navbar from "./Navbar";
 import ChatList from "../Specific/ChatList";
 import { useParams } from "react-router-dom";
@@ -22,15 +22,14 @@ import { MessageAlert } from "@/Types/types";
 import { useDispatch } from "react-redux";
 import { incrementNotificationCount } from "@/redux/slices/chatSlice";
 
-type WrappedComponentProps = {
-  [key: string]: any; // Use appropriate type for your props
-};
 
-const AppLayout =
-  () => (WrappedComponent: React.ComponentType<WrappedComponentProps>) => {
-    return (props: WrappedComponentProps) => {
+interface AppLayoutProps {
+  children: ReactNode;
+}
+
+const AppLayout: FC<AppLayoutProps> = ({ children }) => {
       const socket = getSocket();
-      console.log(socket.id);
+      // console.log(socket.id);
 
       const params = useParams();
       const CurrentchatId = params.id;
@@ -220,6 +219,7 @@ const AppLayout =
                     newMessagesAlert={newMessaegAlerts}
                     onlineUsers={onlineUsers}
                     handleDeleteChat={handledeleteChat}
+                    
                   />
                 )}
               </div>
@@ -258,7 +258,7 @@ const AppLayout =
               </div>
 
               <div className="col-span-2 md:col-span-1 glassmorphism rounded-2xl ">
-                <WrappedComponent {...props} />
+              {children}
               </div>
 
               <div className="hidden lg:block glassmorphism rounded-2xl">
@@ -266,28 +266,9 @@ const AppLayout =
               </div>
             </div>
           </div>
-
-          <style jsx global>{`
-            @keyframes pulse {
-              0%,
-              100% {
-                opacity: 0.3;
-              }
-              50% {
-                opacity: 0.15;
-              }
-            }
-
-            .glassmorphism {
-              background: rgba(255, 255, 255, 0.05);
-              backdrop-filter: blur(10px) saturate(150%);
-              border: 1px solid rgba(255, 255, 255, 0.1);
-              box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            }
-          `}</style>
         </div>
       );
     };
-  };
+  
 
 export default AppLayout;

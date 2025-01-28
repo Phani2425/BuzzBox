@@ -151,6 +151,14 @@ html, body {
   }
 }
 
+@layer components {
+  .glassmorphism {
+    @apply bg-white/[0.05] border border-white/10;
+    backdrop-filter: blur(10px) saturate(150%);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+}
+
 body {
   display: flex;
   align-items: center;

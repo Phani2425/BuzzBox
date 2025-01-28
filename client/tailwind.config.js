@@ -4,6 +4,16 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+		keyframes: {
+			pulse: {
+			  '0%, 100%': { opacity: '0.3' },
+			  '50%': { opacity: '0.15' },
+			},
+		  },
+		  animation: {
+			pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+			'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+		  },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
