@@ -1,4 +1,4 @@
-const BASE_URL = 'https://buzzbox-7tfb.onrender.com';
+const BASE_URL = 'https://buzzbox-7tfb.onrender.com/api/v1';
 
 //auth apis
 export const authEndpoints = {
