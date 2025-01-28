@@ -10,7 +10,7 @@ html, body {
 
 @layer base {
   :root {
-
+    height: 100%;
     --background: 0 0% 100%;
 
     --foreground: 0 0% 3.9%;
@@ -60,6 +60,17 @@ html, body {
     --chart-5: 27 87% 67%;
 
     --radius: 0.5rem
+  }
+  html {
+    @apply h-[100dvh] overscroll-none;
+  }
+
+  body {
+    @apply flex min-h-[100dvh] w-screen overflow-hidden overscroll-none touch-manipulation;
+  }
+
+  #root {
+    @apply flex-1 h-full w-full relative;
   }
   .dark {
 
@@ -148,6 +159,12 @@ html, body {
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  .overscroll-none {
+    overscroll-behavior: none;
   }
 }
 

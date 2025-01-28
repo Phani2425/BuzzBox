@@ -175,12 +175,12 @@ const AppLayout: FC<AppLayoutProps> = ({ children }) => {
             }}
           />
 
-          <div className="h-[calc(100vh-4rem)] px-4 py-4 md:py-6 w-screen">
+          <div className="h-screen px-4 py-4 md:py-6 w-screen">
             <Navbar
               isMobileMenuOpen={isMobileMenuOpen}
               setIsMobileMenuOpen={setIsMobileMenuOpen}
             />
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] gap-6 h-[calc(100%-2rem)] mt-4 md:mt-8  ">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] gap-6 h-[calc(100vh-6rem)] md:h-[calc(100vh-9rem)] mt-4 md:mt-8  ">
               {/* Left section */}
               <div
                 className={`hidden md:block glassmorphism rounded-2xl overflow-y-auto scrollbar-hide ${
@@ -257,7 +257,7 @@ const AppLayout: FC<AppLayoutProps> = ({ children }) => {
                 </div>
               </div>
 
-              <div className="col-span-2 md:col-span-1 glassmorphism rounded-2xl ">
+              <div className="col-span-2 md:col-span-1  glassmorphism rounded-2xl ">
               {children}
               </div>
 
