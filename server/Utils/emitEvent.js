@@ -4,9 +4,9 @@ exports.emitEvent = (req, event, users, data) => {
     try {
       const io = req.app.get('io');
       
-      console.log('Emitting event:', event);
-      console.log('To users:', users);
-      console.log('With data:', data);
+      // console.log('Emitting event:', event);
+      // console.log('To users:', users);
+      // console.log('With data:', data);
   
       // Emit to all specified users
 
