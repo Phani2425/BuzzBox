@@ -26,9 +26,9 @@ createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <HelmetProvider>
       <Provider store={store}>
-        <div onContextMenu={(e) => e.preventDefault()}>
+        
         <App />
-        </div>
+        
         <Toaster/>
       </Provider>
     </HelmetProvider>
