@@ -10,7 +10,6 @@ import {
   Video,
   FileText,
   Music,
-  X,
 } from "lucide-react";
 import { getSocket } from "@/Socket";
 import {
@@ -19,7 +18,6 @@ import {
   START_TYPING,
   STOP_TYPING,
   NEW_ATTACHMENT,
-  ALERT,
 } from "@/constants/events";
 import { useParams } from "react-router-dom";
 import {
@@ -31,7 +29,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/main";
 import { useToast } from "@/hooks/use-toast";
 
-import type { Attachment, ChatDetails, Message } from "@/Types/types";
+import type {  ChatDetails, messageForRealtime, NewMessage, SelectedAttachmentForSend } from "@/Types/types";
 import { useSocketEvent } from "@/hooks/utilityHooks";
 import BouncingDotsLoader from "@/Components/Loader/BouncingDotLoader";
 import { motion } from "framer-motion";
@@ -53,7 +51,7 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const socket = getSocket();
   const [chat, setChat] = useState<ChatDetails | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<NewMessage[]>([]);
   const { user } = useSelector((state: RootState) => state.auth);
   const { toast } = useToast();
   const [isTyping, setIsTyping] = useState(false);
@@ -62,7 +60,7 @@ const Chat = () => {
   const [MessageLoading, setMessageLoading] = useState<boolean>(false);
   const loadingPreviousMessages = useRef(false);
 
-  const [selectedFiles, setSelectedFiles] = useState<Attachment[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<SelectedAttachmentForSend[]>([]);
   const [isFilePreviewOpen, setIsFilePreviewOpen] = useState(false);
   const [isAttachmentLoading, setIsAttachmentLoading] = useState(false);
 
@@ -72,12 +70,12 @@ const Chat = () => {
 
   const handleFileSelect = (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: Attachment["type"]
+    type: SelectedAttachmentForSend["type"]
   ) => {
     const files = e.target.files;
     if (!files) return;
 
-    const newFiles = Array.from(files).map((file) => ({
+    const newFiles:SelectedAttachmentForSend[] = Array.from(files).map((file) => ({
       file,
       type,
     }));
@@ -87,7 +85,7 @@ const Chat = () => {
   };
 
   const handleAttachmentSubmit = async () => {
-    if (selectedFiles.length === 0) return;
+    if (selectedFiles.length === 0 || !id) return;
 
     try {
       setIsAttachmentLoading(true);
@@ -199,7 +197,7 @@ const Chat = () => {
   //   }
   // };
 
-  const NewMessaegeEventHandler = (data) => {
+  const NewMessaegeEventHandler = (data:{chatId:string,message:messageForRealtime}) => {
     // console.log(data);
     if (data.chatId !== id) return;
     setMessages((prev) => [...prev, data.message]);
@@ -259,7 +257,7 @@ const Chat = () => {
   }) => {
     if (data.chatId !== id) return;
 
-    const newMessage = {
+    const newMessage :NewMessage= {
       _id: Math.random().toString(), // temporary ID for real-time message
       sender: data.message.sender,
       attachments: data.message.attachments,

@@ -20,7 +20,7 @@ const ChatList: React.FC<chatList> = ({
 
   return (
     <div className={`w-[${w}] flex flex-col`}>
-      {chats.map((chat, index) => {
+      {chats.map((chat) => {
        
         // first we will destructure thr data from the chat object
         const { grpAvatar, _id, name, groupChat, members } = chat;
@@ -44,7 +44,6 @@ const ChatList: React.FC<chatList> = ({
             key={_id}
             chatSelected={chatId === _id}
             handleDeleteChat={handleDeleteChat}
-            index={index}
             setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
         );

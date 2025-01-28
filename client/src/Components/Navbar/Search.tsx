@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import UserItem from "../Shared/UserItem";
 import { useEffect, useState } from "react";
-import { User } from "@/Types/types";
+import { SentRequest, User } from "@/Types/types";
 import {
   useLazyGetRequestsQuery,
   useLazySearchUsersQuery,
@@ -32,11 +32,11 @@ const Search = ({
   const [sendFriendRequest] = useSendFriendRequestMutation();
   const { toast } = useToast();
 
-  const [requestData, setrequestData] = useState([]);
+  const [requestData, setrequestData] = useState<SentRequest[]>([]);
   const [getRequests] = useLazyGetRequestsQuery();
 
   useEffect(() => {
-    getRequests().then(({data}) => {
+    getRequests({}).then(({data}) => {
        setrequestData(data.sentRequests);
     })
   },[])
@@ -56,7 +56,7 @@ const Search = ({
           throw new Error(err);
         });
 
-        getRequests().then(({data}) => {
+        getRequests({}).then(({data}) => {
           setrequestData(data.sentRequests);
        })
     } catch (err) {
@@ -106,10 +106,10 @@ const Search = ({
     
     if(requestData.length > 0) {
 
-      const req = requestData.find((req) => req.receiver._id === id)
+      const resreq = requestData.find((req) => req.receiver._id === id)
 
-      if(req){
-       return req.status;
+      if(resreq){
+       return resreq.status;
       }
       else{
         return 'no'

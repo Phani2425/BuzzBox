@@ -37,7 +37,7 @@ const Newgroup = ({
     try{
 
       setloading(true);
-      await getMyFriends().then(({data}) => {
+      await getMyFriends({}).then(({data}) => {
         setusers(data.users);
       })
 
@@ -92,13 +92,13 @@ const Newgroup = ({
           toast({
             title: "Success",
             description: "Group created successfully",
-            variant: "success"
+            variant: "default"
           })
         }
         else{
           toast({
             title: "Error",
-            description: res.error.data.message,
+            description: 'Something went wrong',
             variant: "destructive"
           })
         }

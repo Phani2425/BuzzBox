@@ -2,6 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useGetSingleChatMessagesQuery } from "@/redux/rtkQueryAPIs";
 import { Loader2, FileText } from "lucide-react";
+import { chatMessagesAdminDashboard } from "@/Types/types";
 
 interface ChatMessagesModalProps {
   chatId: string;
@@ -28,7 +29,7 @@ const ChatMessagesModal = ({ chatId, isOpen, onClose }: ChatMessagesModalProps) 
             </div>
           ) : (
             <div className="space-y-4 p-4">
-              {data?.messages.map((message) => (
+              {data?.messages.map((message:chatMessagesAdminDashboard) => (
                 <div
                   key={message._id}
                   className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-lg"

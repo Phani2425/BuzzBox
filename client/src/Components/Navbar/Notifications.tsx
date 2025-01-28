@@ -70,7 +70,7 @@ const Notifications = ({
   const [getReuests] = useLazyGetRequestsQuery();
 
   const fetchAllRequests = async () => {
-    await getReuests()
+    await getReuests({})
       .then(({ data }) => {
         console.log(data);
         setrequests(data.receivedRequests);

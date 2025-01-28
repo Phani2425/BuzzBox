@@ -1,3 +1,4 @@
+import { User } from "@/Types/types";
 import { MinusCircle, PlusCircle } from "lucide-react";
 
 interface Prop {

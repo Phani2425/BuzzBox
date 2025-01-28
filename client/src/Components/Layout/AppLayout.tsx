@@ -36,7 +36,7 @@ const AppLayout =
       const CurrentchatId = params.id;
       const { toast } = useToast();
 
-      const { data, error, isLoading, isError } = useMyChatsQuery();
+      const { data, error, isLoading, isError } = useMyChatsQuery({});
 
       const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
@@ -51,7 +51,7 @@ const AppLayout =
 
       const fetchUnreadMessages = async () => {
         try {
-          await getUnreadMessages().then((res) => {
+          await getUnreadMessages({}).then((res) => {
             console.log("unread messages:- ", res.data.result);
             setNewMessageAlerts(res.data.result);
           });
@@ -103,7 +103,7 @@ const AppLayout =
       }, [CurrentchatId, newMessaegAlerts]);
 
       const handledeleteChat = (
-        e: React.MouseEvent<HTMLDivElement>,
+        e: React.MouseEvent<HTMLAnchorElement>,
         _id: string,
         groupChat: boolean
       ) => {

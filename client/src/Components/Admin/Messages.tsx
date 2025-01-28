@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Search, FileText, Image as ImageIcon, Headphones } from "lucide-react";
 import { format } from "date-fns";
 import { Card } from "@/components/ui/card";
+import { chatMessagesAdminDashboard } from "@/Types/types";
 
 const Messages = () => {
-  const { data, isLoading } = useGetChatMessagesQuery();
+  const { data, isLoading } = useGetChatMessagesQuery({});
   const [search, setSearch] = useState("");
 
-  const filteredMessages = data?.messages.filter(message => 
+  const filteredMessages = data?.messages.filter((message:chatMessagesAdminDashboard) => 
     message.content.toLowerCase().includes(search.toLowerCase()) ||
     message.sender.userName.toLowerCase().includes(search.toLowerCase())
   );
@@ -40,7 +41,7 @@ const Messages = () => {
         <Card className="overflow-hidden">
           <ScrollArea className="h-[calc(100vh-12rem)]">
             <div className="space-y-4 p-4">
-              {filteredMessages?.map((message) => (
+              {filteredMessages?.map((message:chatMessagesAdminDashboard) => (
                 <div
                   key={message._id}
                   className="group bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800/70 transition-colors"
@@ -70,13 +71,13 @@ const Messages = () => {
                         >
                           {attachment.resource_type === 'image' ? (
                             <ImageIcon className="h-4 w-4" />
-                          ) : attachment.resource_type === 'audio' ? (
+                          ) : attachment.resource_type === 'raw' ? (
                             <Headphones className="h-4 w-4" />
                           ) : (
                             <FileText className="h-4 w-4" />
                           )}
                           <span className="truncate max-w-[150px]">
-                            {attachment.original_filename || `Attachment ${index + 1}`}
+                            { `Attachment ${index + 1}`}
                           </span>
                         </a>
                       ))}

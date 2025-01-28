@@ -14,7 +14,6 @@ const Chatitem: React.FC<ChatitemProps> = ({
   chatSelected,
   isOnline,
   newMessageAlert,
-  index = 0,
   handleDeleteChat,
   setIsMobileMenuOpen,
 }) => {
@@ -26,10 +25,18 @@ const Chatitem: React.FC<ChatitemProps> = ({
     }
     navigate(`/chat/${_id}`);
   };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (handleDeleteChat) {
+      handleDeleteChat(e, _id, groupChat);
+    }
+  };
+
+  
   return (
     <Link
       to={`/chat/${_id}`}
-      onContextMenu={(e) => handleDeleteChat(e, _id, groupChat)}
+      onContextMenu={handleContextMenu}
       className="w-full"
       onClick={clickHandler}
     >

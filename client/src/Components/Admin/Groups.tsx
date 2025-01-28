@@ -5,13 +5,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
 import ChatMessagesModal from "./ChatMessagesModal";
+import { groupChatForAdminDashboard } from "@/Types/types";
 
 const Groups = () => {
-  const { data, isLoading } = useGetAllChatsQuery();
+  const { data, isLoading } = useGetAllChatsQuery({});
   const [search, setSearch] = useState("");
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
-  const filteredChats = data?.chats.filter((chat) =>
+  const filteredChats = data?.chats.filter((chat:groupChatForAdminDashboard) =>
     chat.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -47,7 +48,7 @@ const Groups = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredChats?.map((chat) => (
+              {filteredChats?.map((chat:groupChatForAdminDashboard) => (
                 <TableRow key={chat._id}>
                   <TableCell>{chat.indexId}</TableCell>
                   <TableCell>{chat.name}</TableCell>

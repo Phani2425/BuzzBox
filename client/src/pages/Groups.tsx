@@ -22,7 +22,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
-import { User } from "@/Types/types";
+import { groupChatForAdminDashboard, User } from "@/Types/types";
 import UserItemForGroup from "@/Components/Shared/UserItemForGroup";
 import { useToast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";
@@ -39,6 +39,13 @@ import {
 import GroupAvatar from "@/Components/Shared/GroupAvatar";
 import Newgroup from "@/Components/Navbar/Newgroup";
 import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  QueryDefinition, 
+  BaseQueryFn, 
+  FetchBaseQueryError,
+  FetchArgs,
+  QueryActionCreatorResult
+} from "@reduxjs/toolkit/query";
 
 interface groupinterface {
   _id: string;
@@ -62,7 +69,7 @@ const Groups = () => {
     refetch,
     error,
     isError,
-  } = useGetAllGroupQuery();
+  } = useGetAllGroupQuery({});
 
   const { toast } = useToast();
   // state variable for newGroup modal
@@ -78,7 +85,7 @@ const Groups = () => {
     if (searchQuery.trim().length === 0) {
       setGroupShown(groups?.allgroups);
     } else {
-      const searchedGroups = groups.allgroups.filter((group) =>
+      const searchedGroups = groups.allgroups.filter((group:groupChatForAdminDashboard) =>
         group.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setGroupShown(searchedGroups);
@@ -154,7 +161,7 @@ const Groups = () => {
   }
 
   const selectedGroupDetails = groups?.allgroups.find(
-    (g) => g._id === selectedGroup
+    (g:groupChatForAdminDashboard) => g._id === selectedGroup
   );
   const isGroupAdmin = selectedGroupDetails?.creator === user._id;
 
@@ -211,7 +218,7 @@ const Groups = () => {
                   </motion.div>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full sm:w-[400px] p-0">
-                  <GroupDetails group={group} isAdmin={isGroupAdmin} />
+                  <GroupDetails group={group} isAdmin={isGroupAdmin} refetch={refetch} />
                 </SheetContent>
               </Sheet>
             ))}
@@ -326,15 +333,30 @@ const Groups = () => {
   );
 };
 
-const GroupDetails = ({
+interface GroupQueryResponse {
+  success: boolean;
+  groups: groupinterface[];
+}
+
+interface GroupDetailsProps {
+  group: groupinterface;
+  isAdmin: boolean;
+  refetch: () => QueryActionCreatorResult<
+    QueryDefinition<
+      void,
+      BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
+      "Chat" | "User" | "Requests" | "Group",
+      GroupQueryResponse
+    >
+  >;
+}
+
+const GroupDetails: React.FC<GroupDetailsProps> = ({
   group,
   isAdmin,
   refetch,
-}: {
-  group: groupinterface;
-  isAdmin: boolean;
-  refetch: () => QueryActionCreatorResult<any> ;
-}) => {
+}
+ ) => {
   const [leaveGroup] = useLeaveGroupMutation();
   const [removeMember] = useRemoveMembersMutation();
   const [deleteGroup] = useDeleteGroupMutation();
@@ -573,7 +595,20 @@ export default Groups;
 
 //Now we will create the modal for renaming the group
 
-const RenameGroupModal = ({ onClose, currentGroupDetail,refetch }) => {
+interface RenameGroupModalProps {
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  currentGroupDetail:groupinterface ;
+  refetch: () => QueryActionCreatorResult<
+    QueryDefinition<
+      void,
+      BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
+      "Chat" | "User" | "Requests" | "Group",
+      GroupQueryResponse
+    >
+  >;
+}
+
+const RenameGroupModal:React.FC<RenameGroupModalProps> = ({ onClose, currentGroupDetail,refetch }) => {
   const clickRef = useRef(null);
 
   const clcikHandler = (e: React.MouseEvent) => {
@@ -672,7 +707,7 @@ const CommonModal = ({ heading, desc, confirm, onClose } : {
   heading: string;
   desc: string;
   confirm: () => void;
-  onClose: (val: boolean) => void;
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const clickRef = useRef(null);
 
@@ -708,11 +743,20 @@ const CommonModal = ({ heading, desc, confirm, onClose } : {
   );
 };
 
-const AddMemberModal = ({ onClose,refetch,group } :{
-  onClose: (val: boolean) => void;
-  refetch: () => QueryActionCreatorResult<any> ;
-  group: groupinterface;
-}) => {
+interface AddMemberModalProp {
+  onClose: React.Dispatch<React.SetStateAction<boolean>>;
+  group:groupinterface ;
+  refetch: () => QueryActionCreatorResult<
+    QueryDefinition<
+      void,
+      BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
+      "Chat" | "User" | "Requests" | "Group",
+      GroupQueryResponse
+    >
+  >;
+}
+
+const AddMemberModal:React.FC<AddMemberModalProp> = ({ onClose,refetch,group }) => {
   const clickRef = useRef(null);
   const [membersToBeAdded, setMembersToBeAdded] = useState<string[]>([]);
   const [users, setusers] = useState<User[]>([]);
@@ -723,9 +767,9 @@ const AddMemberModal = ({ onClose,refetch,group } :{
   const [getMyFriends] = useLazyGetMyFriendsQuery();
 
   const fetchFriends = async () => {
-    await getMyFriends().then((res) => { 
+    await getMyFriends({}).then((res) => { 
       const resultUser = res.data.users;
-      const userExceptMembers = resultUser.filter((user) => group.members.every((member) => member._id !== user._id));
+      const userExceptMembers = resultUser.filter((user:User) => group.members.every((member) => member._id !== user._id));
      setusers(userExceptMembers);
      setUsersShown(userExceptMembers);
     } )

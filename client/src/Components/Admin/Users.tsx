@@ -12,12 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Loader2, Users, Boxes } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { userForAdminDashboard } from "@/Types/types";
 
 const UsersPage = () => {
-  const { data, isLoading } = useGetAllUsersQuery();
+  const { data, isLoading } = useGetAllUsersQuery({});
   const [search, setSearch] = useState("");
 
-  const filteredUsers = data?.users.filter((user) =>
+  const filteredUsers = data?.users.filter((user:userForAdminDashboard) =>
     user.userName.toLowerCase().includes(search.toLowerCase()) ||
     user.email.toLowerCase().includes(search.toLowerCase())
   );
@@ -55,7 +56,7 @@ const UsersPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers?.map((user) => (
+              {filteredUsers?.map((user:userForAdminDashboard) => (
                 <TableRow key={user.email}>
                   <TableCell>
                     <div className="flex items-center gap-3">

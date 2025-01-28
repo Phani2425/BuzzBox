@@ -1,5 +1,6 @@
 import { Outlet, useLocation, useNavigate, Link } from "react-router-dom";
-import { Menu, Moon, Sun } from "lucide-react";
+import {  Menu, Moon, Sun } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import {
   Sheet,
@@ -33,13 +34,15 @@ import {
 import { useTheme } from "@/components/ui/theme-provider";
 import { useState } from "react";
 
-const iconMap = {
-  Gauge,
-  Users,
-  MessageSquare,
-  MessageCircleMore,
-  Settings,
-  LogOut,
+type IconName = string;
+
+const iconMap:Record<IconName, LucideIcon> = {
+  'Gauge':Gauge,
+  'Users':Users,
+  'MessageSquare':MessageSquare,
+  'MessageCircleMore':MessageCircleMore,
+  'Settings':Settings,
+  'LogOut':LogOut,
 };
 
 const AdminLayout = () => {
@@ -139,7 +142,7 @@ const AdminNavBar = () => {
             <div className="flex flex-col flex-grow pt-5 overflow-y-auto scrollbar-hide h-full">
               <nav className="flex-1 px-2 space-y-1">
                 {AdminNavBarTabs.map((item) => {
-                  const Icon = iconMap[item.iconName];
+                  const Icon:LucideIcon = iconMap[item.iconName];
                   const isActive = location.pathname === item.path;
 
                   return (

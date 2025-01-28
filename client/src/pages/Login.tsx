@@ -14,6 +14,13 @@ import {setUser, setToken, setUserName} from "@/redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { auth, googleProvider ,githubProvider} from "@/utils/firebase";
 import { signInWithPopup } from "firebase/auth";
+import { UserCredential } from 'firebase/auth';
+
+interface GoogleAuthResponse extends UserCredential {
+  _tokenResponse?: {
+    isNewUser: boolean;
+  };
+}
 
 
 interface Form {
@@ -27,16 +34,23 @@ const Login = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [image, setimage] = useState("");
-  const [previewimge, setpreviewimage] = useState("");
+  const [image, setimage] = useState<File | null>(null);
+  const [previewimge, setpreviewimage] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setloading] = useState(false);
 
   const [login, setLogin] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles) => {
-    setimage(acceptedFiles[0]);
-    setpreviewimage(URL.createObjectURL(acceptedFiles[0]));
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles && acceptedFiles.length > 0) {
+      const file = acceptedFiles[0];
+      setimage(file);
+      const previewUrl = URL.createObjectURL(file);
+      setpreviewimage(previewUrl);
+      
+      // Cleanup preview URL when component unmounts
+      return () => URL.revokeObjectURL(previewUrl);
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
@@ -107,7 +121,9 @@ const Login = () => {
       const form = new FormData();
       form.append("email", formdata.email);
       form.append("password", formdata.password);
-      form.append("image", image);
+      if (image) {
+        form.append("image", image);
+      }
       if (userNameUnique) {
         form.append("userName", formdata.userName);
       } else {
@@ -146,10 +162,10 @@ const Login = () => {
 
   const signInWithGoogle = async () => {
     try {
-      const result = await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider) as GoogleAuthResponse;
       const { user } = result;
       const { displayName, email, photoURL } = user;
-      const isNewUser = result._tokenResponse.isNewUser;
+      const isNewUser = result._tokenResponse?.isNewUser ?? false;
 
       const response = await connectToApi("POST", authEndpoints.oauth , {
         email,
@@ -179,11 +195,10 @@ const Login = () => {
 
   const signInWithGithub = async () => {
     try {
-      const result = await signInWithPopup(auth, githubProvider);
+      const result = await signInWithPopup(auth, githubProvider) as GoogleAuthResponse;
       const { user } = result;
       const { displayName, email, photoURL } = user;
-      const isNewUser = result._tokenResponse.isNewUser;
-
+      const isNewUser = result._tokenResponse?.isNewUser ?? false;
       const response = await connectToApi("POST", authEndpoints.oauth, {
         email,
         userName: displayName,

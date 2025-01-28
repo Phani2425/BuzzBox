@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Attachment } from "@/Types/types";
+import { SelectedAttachmentForSend } from "@/Types/types";
 import { FileText, Music, Video, X, Image as ImageIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 interface FilePreviewCardProps {
-  files: Attachment[];
+  files: SelectedAttachmentForSend[];
   onRemove: (index: number) => void;
   onSubmit: () => void;
   isOpen: boolean;
@@ -28,7 +27,7 @@ const FilePreviewCard = ({
             <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded bg-white/5 dark:bg-black/5">
               {file.type === 'image' && <ImageIcon className="h-4 w-4" />}
               {file.type === 'video' && <Video className="h-4 w-4" />}
-              {file.type === 'audio' && <Music className="h-4 w-4" />}
+              {file.type === 'raw' && <Music className="h-4 w-4" />}
               {file.type === 'document' && <FileText className="h-4 w-4" />}
             </div>
             

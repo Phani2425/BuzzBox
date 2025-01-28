@@ -4,8 +4,9 @@ import { FindFileType } from "../../utils/utilities";
 import { transformImage } from "../../utils/utilities";
 import { File, FileCode, FileSpreadsheet, FileText } from "lucide-react";
 import moment from "moment";
+import { NewMessage, User } from "@/Types/types";
 
-const MessageComponent = ({ msg, loggedUser }) => {
+const MessageComponent = ({ msg, loggedUser } : {msg:NewMessage,loggedUser:User}) => {
   return (
     <>
       <motion.div
