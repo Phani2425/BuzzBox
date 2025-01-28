@@ -7,7 +7,7 @@ const Loaders = () => {
   const glassStyle = "bg-white/5 dark:bg-zinc-900/5 backdrop-blur-xl border border-white/10 dark:border-white/5";
   
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white dark:bg-black">
+    <div className="relative h-screen w-screen overflow-hidden bg-white dark:bg-black">
       {/* Background Pattern */}
       <div className="pointer-events-none absolute inset-0 opacity-20 bg-[url('/pattern.svg')]" />
 
