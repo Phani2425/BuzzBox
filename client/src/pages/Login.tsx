@@ -227,7 +227,7 @@ const Login = () => {
 
 
   return (
-    <div className="h-screen w-screen bg-[url('./bg.png')] flex justify-center items-center">
+    <div className="h-screen w-screen bg-[url('/bg.png')] flex justify-center items-center">
       {login ? (
         <LoginForm setLogin={setLogin} />
       ) : (
