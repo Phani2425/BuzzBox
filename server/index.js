@@ -63,6 +63,10 @@ io.use(async (socket, next) => {
     }
     decoded = decodedData;
   });
+
+  if (!decoded || !decoded.id) {
+    throw new Error("Invalid token structure");
+  }
    
 
   const user = await User.findById(decoded.id);
